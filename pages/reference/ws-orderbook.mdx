@@ -1,0 +1,166 @@
+---
+title: "WebSocket Orderbook"
+description: "Real-time orderbook channels for perpetuals, options, and market makers."
+---
+
+<Callout type="info">
+For market data channels (index prices, funding rates, volatility), see [WebSocket Market Data](/reference/ws-market-data).
+</Callout>
+
+## Overview
+
+Three orderbook channels provide real-time order events with different scopes. Each channel delivers `post_order`, `cancel_order`, and `update_order` events as they occur.
+
+| Channel | Scope | Authentication |
+| --- | --- | --- |
+| `perps_orderbook` | Perpetual futures orders | Not required |
+| `options_orderbook` | Options orders | Not required |
+| `maker_orderbook` | All orders for a specific maker | Required |
+
+## Event Types
+
+| Event | Description |
+| --- | --- |
+| `post_order` | A new order is placed on the book |
+| `cancel_order` | An existing order is removed from the book |
+| `update_order` | An existing order's size is modified |
+
+## Orderbook Event Fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `order_id` | string | Unique order identifier |
+| `instrument` | string | Instrument the order belongs to |
+| `side` | string | `buy` or `sell` |
+| `price` | string | Order price |
+| `size` | string | Original order size |
+| `remaining_size` | string | Remaining unfilled size |
+| `order_type` | string | `limit`, `market`, etc. |
+| `timestamp` | string | ISO 8601 timestamp of the event |
+
+## Perps Orderbook
+
+Subscribe by instrument or pair. Supports direction filtering and an initial snapshot option.
+
+**By instrument:**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "perps_orderbook",
+  "instrument": "ETH-PERP"
+}
+```
+
+**By pair (all perps for a pair):**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "perps_orderbook",
+  "pair": "ETH_USDC"
+}
+```
+
+**With direction filtering (buy-side only):**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "perps_orderbook",
+  "instrument": "ETH-PERP",
+  "side": "buy"
+}
+```
+
+**With initial snapshot:**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "perps_orderbook",
+  "instrument": "ETH-PERP",
+  "snapshot": true
+}
+```
+
+When `snapshot` is `true`, the first message is a full orderbook snapshot (`type: "snapshot"`), followed by incremental `update` messages.
+
+## Options Orderbook
+
+Subscribe by instrument or market. Provides initial snapshots and incremental updates for each options contract.
+
+**By instrument:**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "options_orderbook",
+  "instrument": "ETH-28MAR26-2000-C"
+}
+```
+
+**By market (all options for a pair):**
+
+```json
+{
+  "op": "subscribe",
+  "channel": "options_orderbook",
+  "market": "ETH"
+}
+```
+
+The initial snapshot includes the full orderbook state for each subscribed instrument. Subsequent messages contain incremental order events.
+
+## Maker Orderbook
+
+A market maker-specific feed that tracks all orders across all instruments for a given maker Ethereum address. Requires authentication and the maker's address.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "maker_orderbook",
+  "maker_address": "0xAbC123..."
+}
+```
+
+This channel delivers events for every instrument where the specified maker has active orders. It is intended for market makers who need a consolidated view of their order activity.
+
+## Edit Mechanics
+
+Order edits are represented as a `cancel_order` event for the original order followed by a `post_order` event for the replacement. Both events share the same timestamp. There is no dedicated "edit" event type -- clients should handle the cancel/post pair atomically when the timestamps match.
+
+```json
+{
+  "type": "cancel_order",
+  "channel": "perps_orderbook",
+  "data": {
+    "order_id": "ord_old_123",
+    "instrument": "ETH-PERP",
+    "timestamp": "2026-03-15T12:00:00.500Z"
+  }
+}
+```
+
+```json
+{
+  "type": "post_order",
+  "channel": "perps_orderbook",
+  "data": {
+    "order_id": "ord_new_456",
+    "instrument": "ETH-PERP",
+    "side": "buy",
+    "price": "1840.00",
+    "size": "5.0",
+    "remaining_size": "5.0",
+    "order_type": "limit",
+    "timestamp": "2026-03-15T12:00:00.500Z"
+  }
+}
+```
+
+<CardGrid>
+  <LinkCard title="WebSocket Market Data" href="/reference/ws-market-data" description="Index prices, funding rates, and volatility" />
+  <LinkCard title="WebSocket Account" href="/reference/ws-account" description="Real-time account and position channels" />
+  <LinkCard title="Order Types" href="/reference/order-types" description="Supported order types and parameters" />
+</CardGrid>

@@ -1,0 +1,82 @@
+---
+title: "Liquidations"
+description: "How Kyan's three-phase liquidation process protects the exchange and traders."
+---
+
+# Liquidations
+
+Liquidation is the process by which the protocol forcibly closes positions in a portfolio that no longer has sufficient margin to cover its risk. It exists to protect the insurance fund and all counterparties on the exchange from bearing losses caused by under-collateralized accounts.
+
+Kyan uses a graduated, three-phase liquidation process designed to resolve margin shortfalls with the minimum possible disruption to the trader and the market.
+
+## Margin ratios: IMr and MMr
+
+Two margin ratios govern the lifecycle of a portfolio's health:
+
+- **Initial Margin ratio (IMr)** is the minimum margin required to open new positions. If your portfolio's margin falls below this threshold, you cannot place new orders that would increase your exposure, but your existing positions remain open.
+- **Maintenance Margin ratio (MMr)** is the minimum margin required to keep existing positions open. If your portfolio's margin falls below this level, the liquidation engine activates.
+
+The gap between IMr and MMr provides a buffer. As market conditions move against you, your margin ratio declines from IMr toward MMr. During this window you can take corrective action: deposit more collateral, reduce position size, or add hedges to lower your margin requirement.
+
+<Callout type="warning">
+Once your margin ratio hits MMr, the liquidation engine takes over automatically. You will not be able to modify positions manually until the engine has restored the portfolio to a healthy state.
+</Callout>
+
+## Phase 1: Delta hedging and perp liquidation
+
+The liquidation engine's first action is to reduce the portfolio's net delta exposure by liquidating perpetual positions. Perpetual futures are the most liquid and simplest positions to close, and flattening delta is often the fastest way to reduce overall portfolio risk.
+
+In this phase, the engine may partially or fully close perp positions to bring the portfolio's delta closer to zero. If reducing delta exposure is enough to bring the margin ratio back above MMr, the liquidation stops here.
+
+This phase is the least disruptive. It preserves options positions and their associated strategies, only trimming the perp hedge to restore margin health.
+
+## Phase 2: Portfolio decomposition
+
+If delta hedging alone is not sufficient, the engine moves to portfolio decomposition. In this phase, the system breaks the portfolio into individual positions and evaluates which ones contribute the most risk.
+
+The riskiest positions are liquidated first. The engine continues closing individual positions, one at a time, until the portfolio's margin ratio is restored above the maintenance threshold. The goal is to preserve as much of the portfolio structure as possible while removing enough risk to bring the account back to health.
+
+Positions are prioritized for liquidation based on their marginal contribution to the portfolio's worst-case scenario loss. A deeply out-of-the-money short option that contributes disproportionate tail risk, for example, would be liquidated before a well-hedged spread.
+
+## Phase 3: Full liquidation and bankruptcy
+
+If the portfolio remains under-margined after phases 1 and 2, the engine proceeds to full liquidation. All remaining positions are closed at the best available prices.
+
+If the account's equity is negative after all positions are closed, meaning the losses exceeded the available collateral, the deficit is absorbed by the **insurance fund**. The insurance fund exists specifically for this purpose: to socialize losses from bankrupt accounts so that counterparties are not left holding the shortfall.
+
+The insurance fund is capitalized by a portion of trading fees and liquidation penalties. As long as the fund is solvent, counterparties are fully protected from bankruptcy events.
+
+## Liquidation penalties
+
+When the liquidation engine closes a position, a penalty fee is applied. This fee serves two purposes: it incentivizes traders to manage their margin proactively rather than relying on the liquidation engine, and it contributes capital to the insurance fund.
+
+The penalty is proportional to the size of the position being liquidated. It is deducted from the account's remaining equity before any return of collateral.
+
+## Avoiding liquidation
+
+The best defense against liquidation is active margin management:
+
+- **Monitor your margin ratio.** Keep it well above MMr, especially in volatile markets where rapid price moves can erode margin quickly.
+- **Add collateral.** Depositing additional USDC into a sub-account immediately improves its margin ratio.
+- **Reduce exposure.** Close or reduce positions that contribute disproportionate risk.
+- **Add hedges.** Under portfolio margin, adding an offsetting position can reduce your margin requirement. A long put, for example, caps the downside of a long perp and may lower the portfolio's worst-case scenario loss.
+
+---
+
+<LinkCard
+  href="/concepts/portfolio-margin"
+  title="Portfolio Margin"
+  description="How the risk engine determines margin requirements"
+/>
+
+<LinkCard
+  href="/concepts/account-system"
+  title="Account System"
+  description="Sub-accounts and per-asset portfolio structure"
+/>
+
+<LinkCard
+  href="/concepts/settlement"
+  title="Settlement"
+  description="How positions are settled at expiry and via funding"
+/>

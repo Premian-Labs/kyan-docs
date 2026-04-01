@@ -1,0 +1,47 @@
+---
+title: "Smart Contracts"
+description: "Kyan's on-chain contract addresses and architecture on Arbitrum."
+---
+
+<Callout type="tip">
+New to Kyan's architecture? Read [About Kyan](/concepts/about-kyan) for an overview of how on-chain settlement works.
+</Callout>
+
+## Overview
+
+Kyan's smart contracts are deployed on Arbitrum and handle trade settlement, margin custody, and liquidation execution. All trading operations are signed off-chain using [EIP-712 signatures](/reference/eip-712-signatures) and settled on-chain through the clearing house.
+
+## Contract Addresses
+
+**Network:** Arbitrum Sepolia (Chain ID `421614`)
+
+| Contract | Address | Description |
+| --- | --- | --- |
+| Clearing House | `0x...` | Trade settlement, margin, and positions |
+| Insurance Fund | `0x...` | Liquidation loss absorption |
+
+<Callout type="warn">
+Mainnet contract addresses are not yet available. The addresses above are for the Arbitrum Sepolia testnet. Do not send real funds to testnet contracts.
+</Callout>
+
+## Clearing House
+
+The Clearing House is the core contract in Kyan's architecture. It handles:
+
+- **Deposits and withdrawals** -- collateral is deposited into and withdrawn from the clearing house. All margin is held in the contract.
+- **Trade settlement** -- matched orders are settled on-chain by submitting the signed order pair to the clearing house.
+- **Margin calculations** -- the contract enforces margin requirements and prevents under-collateralized positions.
+- **Liquidation execution** -- when an account's margin falls below the maintenance requirement, the clearing house executes liquidation.
+
+## Insurance Fund
+
+The Insurance Fund acts as a backstop for the exchange's solvency:
+
+- **Funding source** -- a portion of liquidation penalties is directed to the insurance fund after each liquidation.
+- **Loss absorption** -- when a liquidated account's losses exceed its remaining collateral, the insurance fund absorbs the difference.
+- **Socialized losses** -- if the insurance fund is depleted, remaining losses are socialized across profitable accounts proportionally.
+
+<CardGrid>
+  <LinkCard title="EIP-712 Signatures" href="/reference/eip-712-signatures" description="Signature types for on-chain operations" />
+  <LinkCard title="API Overview" href="/reference/api-overview" description="API authentication and conventions" />
+</CardGrid>

@@ -1,0 +1,177 @@
+---
+title: "WebSocket Market Data"
+description: "Real-time market data channels: index prices, instruments, funding rates, interest rates, and implied volatility."
+---
+
+<Callout type="info">
+Subscribe to channels using the [WebSocket Commands](/reference/ws-commands) protocol.
+</Callout>
+
+## Overview
+
+Five market data channels are available via WebSocket subscription. Each provides real-time updates for a specific data domain. Subscribe to one or more channels depending on your trading strategy.
+
+| Channel | Description |
+| --- | --- |
+| `index_price` | Underlying asset prices |
+| `instruments` | Available trading instruments |
+| `funding` | Perpetual futures funding rates |
+| `interest_rate` | Interest rates by trading pair |
+| `implied_volatility` | SVI model parameters for the volatility surface |
+
+## Index Price
+
+Real-time underlying asset prices for supported pairs: `BTC_USDC`, `ETH_USDC`, `ARB_USDC`.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "index_price",
+  "pair": "ETH_USDC"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `value` | string | Current index price |
+| `timestamp` | string | ISO 8601 timestamp of the price update |
+
+```json
+{
+  "type": "update",
+  "channel": "index_price",
+  "data": {
+    "pair": "ETH_USDC",
+    "value": "1842.35",
+    "timestamp": "2026-03-15T12:00:00.100Z"
+  }
+}
+```
+
+## Instruments
+
+Updates whenever new trading instruments are added or expired ones are removed. Subscribe to this channel to track available expirations and strikes without polling.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "instruments",
+  "market": "ETH"
+}
+```
+
+The initial message is a `snapshot` containing all active instruments. Subsequent messages are `update` events for additions and removals.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `action` | string | `added` or `removed` |
+| `instrument` | string | Instrument identifier (e.g., `ETH-28MAR26-2000-C`) |
+| `type` | string | `perpetual`, `call`, or `put` |
+| `expiry` | string | Expiration date (ISO 8601), if applicable |
+| `strike` | string | Strike price, if applicable |
+
+## Funding
+
+Perpetual futures funding rate updates. Funding settles every **8 hours** (00:00, 08:00, 16:00 UTC).
+
+```json
+{
+  "op": "subscribe",
+  "channel": "funding",
+  "instrument": "ETH-PERP"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `spot_price` | string | Current spot price |
+| `perpetual_price` | string | Current perpetual price |
+| `funding_rate` | string | Current funding rate (positive = longs pay shorts) |
+| `next_settlement` | string | ISO 8601 timestamp of the next funding settlement |
+
+```json
+{
+  "type": "update",
+  "channel": "funding",
+  "data": {
+    "instrument": "ETH-PERP",
+    "spot_price": "1842.35",
+    "perpetual_price": "1843.10",
+    "funding_rate": "0.000125",
+    "next_settlement": "2026-03-15T16:00:00Z"
+  }
+}
+```
+
+## Interest Rate
+
+Interest rate changes by trading pair. Optionally filter by expiry date to receive only rates relevant to specific expirations.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "interest_rate",
+  "pair": "ETH_USDC"
+}
+```
+
+With expiry filtering:
+
+```json
+{
+  "op": "subscribe",
+  "channel": "interest_rate",
+  "pair": "ETH_USDC",
+  "expiry": "2026-06-27"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `pair` | string | Trading pair |
+| `rate` | string | Annualized interest rate |
+| `expiry` | string | Expiration date the rate applies to |
+| `timestamp` | string | ISO 8601 timestamp |
+
+## Implied Volatility (SVI)
+
+SVI (Stochastic Volatility Inspired) model parameters for the volatility surface. These five parameters define the implied volatility smile for a given expiration and can be used for options pricing.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "implied_volatility",
+  "pair": "ETH_USDC"
+}
+```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `alpha` | string | Vertical translation of the smile |
+| `beta` | string | Slope of the left wing |
+| `rho` | string | Counter-clockwise rotation |
+| `m` | string | Horizontal translation |
+| `sigma` | string | Curvature at the money |
+
+```json
+{
+  "type": "update",
+  "channel": "implied_volatility",
+  "data": {
+    "pair": "ETH_USDC",
+    "expiry": "2026-06-27",
+    "alpha": "0.0412",
+    "beta": "0.2531",
+    "rho": "-0.1245",
+    "m": "0.0023",
+    "sigma": "0.3187",
+    "timestamp": "2026-03-15T12:00:01.000Z"
+  }
+}
+```
+
+<CardGrid>
+  <LinkCard title="WebSocket Orderbook" href="/reference/ws-orderbook" description="Real-time orderbook channels" />
+  <LinkCard title="Fees & Funding" href="/guides/fees-and-funding" description="Funding rate mechanics and fee schedules" />
+  <LinkCard title="WebSocket Commands" href="/reference/ws-commands" description="Subscribe, unsubscribe, and gap detection" />
+</CardGrid>

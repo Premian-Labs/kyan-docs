@@ -7,10 +7,33 @@ description: "Technical specifications for the Kyan API and trading platform"
 
 The technical reference for developers and power users. Look up API endpoints, order parameters, error codes, and other specifications.
 
+## API
+
 <CardGroup cols={3}>
   <Card title="API Overview" icon="terminal" href="/reference/api-overview">Authentication, rate limits, and API conventions</Card>
   <Card title="REST API" icon="terminal" href="/reference/rest-api">Complete HTTP endpoint reference</Card>
-  <Card title="WebSocket API" icon="zap" href="/reference/websocket-api">Real-time market data and order feeds</Card>
   <Card title="Order Types" icon="grid" href="/reference/order-types">All supported order types and parameters</Card>
   <Card title="Error Codes" icon="search" href="/reference/error-codes">Error codes and troubleshooting guide</Card>
+  <Card title="API Keys" icon="cpu" href="/reference/api-keys">Obtain, use, and secure API keys</Card>
+  <Card title="EIP-712 Signatures" icon="layers" href="/reference/eip-712-signatures">Cryptographic signatures for trading</Card>
+</CardGroup>
+
+## WebSocket
+
+<CardGroup cols={3}>
+  <Card title="WS Authentication" icon="zap" href="/reference/ws-authentication">WebSocket authentication and sessions</Card>
+  <Card title="WS Commands" icon="terminal" href="/reference/ws-commands">Request/response protocol and subscriptions</Card>
+  <Card title="WS Connection" icon="zap" href="/reference/ws-connection">Connection lifecycle and reconnection</Card>
+  <Card title="Session Recovery" icon="search" href="/reference/ws-session-recovery">Resume sessions after disconnection</Card>
+  <Card title="Market Data" icon="cpu" href="/reference/ws-market-data">Index prices, funding, IV, and instruments</Card>
+  <Card title="Orderbook" icon="layers" href="/reference/ws-orderbook">Real-time orderbook for perps, options, makers</Card>
+  <Card title="Account" icon="grid" href="/reference/ws-account">Positions, trades, transfers, and liquidations</Card>
+</CardGroup>
+
+## Platform
+
+<CardGroup cols={3}>
+  <Card title="MCP Server" icon="terminal" href="/reference/mcp">AI-powered API exploration via MCP</Card>
+  <Card title="Smart Contracts" icon="map" href="/reference/smart-contracts">On-chain contract addresses on Arbitrum</Card>
+  <Card title="WebSocket API" icon="zap" href="/reference/websocket-api">WebSocket overview and channel summary</Card>
 </CardGroup>

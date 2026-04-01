@@ -1,0 +1,97 @@
+---
+title: "Data Feeds & Pricing"
+description: "How Kyan sources market data from Chainlink and Block Scholes for fair pricing."
+---
+
+# Data Feeds & Pricing
+
+Kyan relies on external oracle feeds to source the market data that drives pricing across the platform. By using independent, manipulation-resistant data sources rather than internal price discovery, the protocol ensures that mark prices, margin calculations, and settlement values are transparent and verifiable.
+
+Two external providers supply the core data: **Chainlink** for index prices and **Block Scholes** for implied volatility parameters.
+
+## Chainlink price feeds
+
+Chainlink oracles provide the **index prices** for each underlying asset supported on Kyan: BTC/USDC, ETH/USDC, and ARB/USDC.
+
+These index prices serve as the reference point for several critical functions:
+
+- **Mark price calculation** for perpetual futures, which determines unrealized P&L and margin requirements.
+- **Settlement prices** at options expiry, which determine payouts for in-the-money contracts.
+- **Risk scenario inputs** for the RiskMatrix, which uses the current index price as the baseline for its 43 stress-test scenarios.
+
+Chainlink aggregates prices from multiple high-quality data sources and publishes them on-chain, providing a decentralized price feed that is resistant to single-source manipulation. Price updates are triggered either by a deviation threshold (the price moves by more than a set percentage) or by a heartbeat interval (a maximum time between updates), whichever comes first.
+
+## Block Scholes volatility feeds
+
+Options pricing requires more than just the price of the underlying asset. It also requires an estimate of how volatile that asset is expected to be over the life of the option. This is where Block Scholes comes in.
+
+Block Scholes provides **SVI (Stochastic Volatility Inspired) parameters** that describe the implied volatility surface for each underlying. The SVI model captures how implied volatility varies across different strike prices and expiration dates, producing a smooth, arbitrage-free volatility surface.
+
+These parameters allow Kyan to look up the appropriate implied volatility for any given strike and expiry combination, rather than relying on sparse individual data points.
+
+## Black-Scholes integration
+
+With both the index price (from Chainlink) and the implied volatility (from Block Scholes), Kyan uses the **Black-Scholes model** to calculate option mark prices and Greeks.
+
+The Black-Scholes model takes five inputs:
+
+| Input | Source |
+|-------|--------|
+| Underlying price | Chainlink index price |
+| Strike price | Defined by the option contract |
+| Time to expiry | Calculated from the current time and the contract's expiration date |
+| Risk-free rate | Protocol parameter |
+| Implied volatility | Block Scholes SVI surface |
+
+From these inputs, the model produces:
+
+- **Mark price** for each option, used for P&L calculation and margin requirements.
+- **Greeks** (delta, gamma, theta, vega) for each option, used by the risk engine and displayed to traders for position management.
+
+## The pricing flow
+
+When a mark price is needed for an option, the system follows this sequence:
+
+<Steps>
+  <Steps.Step>
+    The current index price for the underlying asset is retrieved from the Chainlink oracle feed.
+  </Steps.Step>
+  <Steps.Step>
+    The SVI parameters for the relevant underlying and expiry are retrieved from the Block Scholes feed.
+  </Steps.Step>
+  <Steps.Step>
+    The implied volatility for the specific strike and expiry is interpolated from the SVI surface.
+  </Steps.Step>
+  <Steps.Step>
+    The index price, implied volatility, strike, time to expiry, and risk-free rate are passed into the Black-Scholes model.
+  </Steps.Step>
+  <Steps.Step>
+    The model outputs the option's mark price and Greeks.
+  </Steps.Step>
+</Steps>
+
+This process runs continuously as index prices and volatility parameters update, keeping mark prices current across all listed options.
+
+<Callout type="info">
+Perpetual futures do not use the Black-Scholes model. Their mark price is derived directly from the Chainlink index price combined with the funding rate mechanism. Only options pricing requires the volatility surface from Block Scholes.
+</Callout>
+
+---
+
+<LinkCard
+  href="/concepts/settlement"
+  title="Settlement"
+  description="How settlement prices are determined at expiry"
+/>
+
+<LinkCard
+  href="/concepts/options-basics"
+  title="Options Basics"
+  description="Options terminology and how they work on Kyan"
+/>
+
+<LinkCard
+  href="/concepts/about-kyan"
+  title="About Kyan"
+  description="Platform architecture and key systems"
+/>

@@ -1,0 +1,91 @@
+---
+title: "WebSocket Authentication"
+description: "How to authenticate and manage sessions on the Kyan WebSocket API."
+---
+
+<Callout type="info">
+Read the [WebSocket API](/reference/websocket-api) reference for channels and message formats.
+</Callout>
+
+## Authentication Flow
+
+To trade over the WebSocket API, you must authenticate after establishing a connection. The flow is:
+
+1. Connect to the WebSocket endpoint
+2. Send an `AUTH` message with your API key
+3. Receive a confirmation or error response
+4. Subscribe to private channels (orders, positions)
+
+## Connection
+
+Connect to the WebSocket endpoint:
+
+```
+wss://ws.kyan.blue/v1
+```
+
+## AUTH Command
+
+After connecting, send the following JSON message to authenticate:
+
+```json
+{
+  "op": "auth",
+  "apiKey": "your-api-key",
+  "timestamp": 1711900000000,
+  "signature": "hmac-sha256-signature"
+}
+```
+
+On success, the server responds with:
+
+```json
+{
+  "type": "auth",
+  "status": "ok"
+}
+```
+
+## Trading Workflow
+
+A typical authenticated session follows this sequence:
+
+1. **Authenticate** -- send the `AUTH` message with your API key
+2. **Subscribe** -- subscribe to private channels (`orders`, `positions`) and market data channels
+3. **Place orders** -- submit signed order messages through the WebSocket connection
+4. **Monitor** -- receive real-time updates on order fills, position changes, and market data
+
+## Error Codes
+
+Authentication can fail for the following reasons:
+
+| Code | Meaning |
+| --- | --- |
+| `NOT_FOUND` | Invalid API key -- the key does not exist or has been revoked |
+| `FORBIDDEN` | Key lacks required permissions for the requested operation |
+| `RATELIMITED` | Too many authentication attempts -- wait before retrying |
+
+## Logout
+
+To cleanly close an authenticated session, send a logout message before disconnecting:
+
+```json
+{
+  "op": "logout"
+}
+```
+
+This invalidates the session immediately and frees server-side resources.
+
+## Session Duration
+
+Authenticated sessions are valid for a maximum of **1 hour**. After the session expires, the server closes the connection. Your client must reconnect and re-authenticate to continue trading.
+
+<Callout type="warn">
+Implement automatic reconnection logic in your client. Network interruptions and session expiry are expected -- your client should handle them gracefully.
+</Callout>
+
+<CardGrid>
+  <LinkCard title="WebSocket API" href="/reference/websocket-api" description="Channels and message formats" />
+  <LinkCard title="API Keys" href="/reference/api-keys" description="Obtain and manage your API key" />
+</CardGrid>

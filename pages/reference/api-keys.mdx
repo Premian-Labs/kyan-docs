@@ -1,0 +1,73 @@
+---
+title: "API Keys"
+description: "How to obtain, use, and secure your Kyan API key."
+---
+
+<Callout type="info">
+Read the [API Overview](/reference/api-overview) for rate limits and general conventions.
+</Callout>
+
+## Overview
+
+API keys authenticate requests to the Kyan REST and WebSocket APIs. Every authenticated endpoint requires a valid key. Keys are scoped to your account and can be configured with different permission levels.
+
+## Getting an API Key
+
+API keys are generated through the Kyan dashboard. Under **Settings > API Keys**, click **Create Key**. Keys are provisioned through the Unkey service and displayed once at creation -- store the key immediately, as it cannot be retrieved again.
+
+## Using Your API Key
+
+Pass the API key via the `x-apikey` HTTP header on all requests:
+
+```bash
+curl -X GET https://api.kyan.blue/v1/account \
+  -H "x-apikey: your-api-key"
+```
+
+```typescript
+const response = await fetch("https://api.kyan.blue/v1/account", {
+  headers: {
+    "x-apikey": process.env.KYAN_API_KEY,
+  },
+});
+```
+
+## WebSocket Authentication
+
+For the WebSocket API, pass the API key in the `AUTH` message after connecting:
+
+```json
+{
+  "op": "auth",
+  "apiKey": "your-api-key",
+  "timestamp": 1711900000000,
+  "signature": "hmac-sha256-signature"
+}
+```
+
+WebSocket sessions are valid for up to 1 hour. After expiry, you must reconnect and re-authenticate. See [WebSocket Authentication](/reference/ws-authentication) for the full flow.
+
+## One-Click Trading Sessions
+
+One-click trading provides a simplified flow where a single [EIP-712 signature](/reference/eip-712-signatures) pre-authorizes trading operations for the duration of a session. This eliminates the need to sign each individual order. Sessions are time-limited and can be revoked at any time through the dashboard.
+
+## Security Best Practices
+
+<Callout type="warn">
+Never expose API keys in client-side code, public repositories, or browser-accessible files.
+</Callout>
+
+- **Use environment variables** -- store keys in `.env` files or your platform's secrets manager, never hardcode them.
+- **Rotate keys regularly** -- generate new keys periodically and revoke old ones from the dashboard.
+- **Use separate keys for read-only vs trading** -- create dedicated keys with minimal permissions for each use case.
+- **Monitor key usage** -- review activity in the dashboard to detect unauthorized access.
+
+## Rate Limiting
+
+Requests are rate-limited per API key. When the limit is exceeded, the API returns a `429 Too Many Requests` response with rate limit headers indicating when the window resets. See [API Overview](/reference/api-overview) for specific limits by endpoint category.
+
+<CardGrid>
+  <LinkCard title="EIP-712 Signatures" href="/reference/eip-712-signatures" description="Signature types for trading operations" />
+  <LinkCard title="API Overview" href="/reference/api-overview" description="Authentication and rate limits" />
+  <LinkCard title="MCP Server" href="/reference/mcp" description="AI-powered API exploration" />
+</CardGrid>

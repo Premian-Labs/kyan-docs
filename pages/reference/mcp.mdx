@@ -1,0 +1,117 @@
+---
+title: "MCP Server"
+description: "Set up and use the Kyan MCP server for AI-powered API exploration."
+---
+
+<Callout type="info">
+Read the [API Overview](/reference/api-overview) for authentication and conventions.
+</Callout>
+
+## What is MCP?
+
+The Model Context Protocol (MCP) allows AI assistants to interact directly with the Kyan API. Once configured, your AI assistant can list endpoints, inspect schemas, generate code snippets, and execute API requests on your behalf -- all through natural conversation.
+
+## Setup
+
+You need a [Kyan API key](/reference/api-keys) before configuring MCP. Choose the setup instructions for your platform below.
+
+### Cursor
+
+Add the following to `.cursor/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "kyan": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/sdk", "kyan-mcp-server"],
+      "env": {
+        "KYAN_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+### Windsurf
+
+Add the following to your Windsurf MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "kyan": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/sdk", "kyan-mcp-server"],
+      "env": {
+        "KYAN_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop
+
+Add the following to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "kyan": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/sdk", "kyan-mcp-server"],
+      "env": {
+        "KYAN_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+### Claude Code
+
+Run the following command:
+
+```bash
+claude mcp add kyan -- npx -y @anthropic-ai/sdk kyan-mcp-server
+```
+
+Then set your API key as an environment variable:
+
+```bash
+export KYAN_API_KEY="your-api-key"
+```
+
+## Available Tools
+
+The MCP server exposes 9 tools:
+
+| Tool | Description |
+| --- | --- |
+| `list-endpoints` | List all API endpoints |
+| `get-endpoint` | Get endpoint details |
+| `get-request-body` | Get request body schema |
+| `get-response-schema` | Get response schema |
+| `search-specs` | Search API specifications |
+| `execute-request` | Execute an API request |
+| `get-code-snippet` | Generate code for an endpoint |
+| `search` | Search documentation |
+| `fetch` | Fetch a documentation page |
+
+## Test Your Setup
+
+After configuring MCP, try these prompts in your AI assistant:
+
+- "List all available trading endpoints"
+- "Show me how to place a limit order"
+- "What parameters does the market order endpoint accept?"
+- "Generate a code snippet for fetching the ETH-PERP order book"
+- "Search the docs for WebSocket authentication"
+
+If the assistant can respond with Kyan-specific API details, your setup is working correctly.
+
+<CardGrid>
+  <LinkCard title="API Overview" href="/reference/api-overview" description="Authentication and API conventions" />
+  <LinkCard title="API Keys" href="/reference/api-keys" description="Obtain and manage your API key" />
+</CardGrid>

@@ -1,0 +1,93 @@
+---
+title: "WebSocket Connection"
+description: "Connection lifecycle, error handling, and reconnection strategy."
+---
+
+<Callout type="info">
+Read the [WebSocket API overview](/reference/websocket-api) for a high-level introduction.
+</Callout>
+
+## Connection Endpoint
+
+```
+wss://ws.kyan.blue/v1
+```
+
+All WebSocket connections use TLS. Unencrypted connections are not supported.
+
+## Connection Lifecycle
+
+A healthy connection follows this sequence:
+
+1. **Connect** -- open a WebSocket connection to the endpoint.
+2. **Authenticate** -- send an `auth` message with your API key and signature.
+3. **Subscribe** -- subscribe to the channels you need (market data, orderbook, account).
+4. **Trade** -- send orders and receive fills over the authenticated connection.
+5. **Disconnect** -- close the connection gracefully when done.
+
+```json
+{
+  "op": "auth",
+  "apiKey": "your-api-key",
+  "timestamp": 1711900000000,
+  "signature": "hmac-sha256-signature"
+}
+```
+
+## Error Handling
+
+Error messages follow a standard format:
+
+```json
+{
+  "type": "error",
+  "code": "AUTH_FAILED",
+  "message": "Invalid API key or signature."
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | Always `error` |
+| `code` | string | Machine-readable error code |
+| `message` | string | Human-readable description |
+
+See [Error Codes](/reference/error-codes) for the full list of WebSocket error codes.
+
+## Rate Limiting
+
+WebSocket commands are rate limited using a token bucket algorithm. Each connection has its own bucket:
+
+| Parameter | Value |
+| --- | --- |
+| Bucket capacity | 120 tokens |
+| Refill rate | 10 tokens/second |
+| Cost per command | 1 token |
+
+When the bucket is empty, the server rejects commands with a `RATE_LIMITED` error. Wait for tokens to refill before retrying. Subscriptions and authentication do not consume tokens.
+
+## Reconnection Strategy
+
+Network interruptions are inevitable. Implement a reconnection strategy with exponential backoff and jitter:
+
+1. Start with a **1-second** delay after the first disconnection.
+2. Double the delay on each consecutive failure.
+3. Cap the maximum delay at **30 seconds**.
+4. Add random jitter (0--1 second) to each delay to avoid thundering herd.
+5. Reset the delay to 1 second after a successful connection.
+
+```
+delay = min(2^attempt * 1000, 30000) + random(0, 1000)
+```
+
+## Best Practices
+
+- **Session recovery** -- after reconnecting, use the `recover_session` command to resume your previous session and retrieve buffered messages. See [Session Recovery](/reference/ws-session-recovery).
+- **Heartbeat** -- the server sends `ping` frames every 30 seconds. Respond with `pong` promptly. If no `pong` is received within 60 seconds, the server closes the connection.
+- **Error handling** -- always parse the `code` field in error messages and handle each code appropriately rather than treating all errors the same.
+- **Circuit breaker** -- if reconnection fails repeatedly (e.g., 5 consecutive failures), pause reconnection attempts for a longer period (e.g., 60 seconds) and alert your monitoring system.
+
+<CardGrid>
+  <LinkCard title="Session Recovery" href="/reference/ws-session-recovery" description="Resume sessions and recover missed messages" />
+  <LinkCard title="WebSocket Authentication" href="/reference/websocket-api#authentication" description="API key and signature authentication" />
+</CardGrid>

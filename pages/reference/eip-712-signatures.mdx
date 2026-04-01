@@ -1,0 +1,67 @@
+---
+title: "EIP-712 Signatures"
+description: "Cryptographic signature types required for trading operations on Kyan."
+---
+
+<Callout type="info">
+Read the [API Keys](/reference/api-keys) guide to set up authentication before working with signatures.
+</Callout>
+
+## Overview
+
+Kyan uses EIP-712 typed structured data signatures for all trading operations. EIP-712 defines a standard for hashing and signing typed data, ensuring that every order and action is cryptographically verifiable on-chain. This provides non-repudiation and tamper protection without requiring on-chain transactions for every operation.
+
+## EIP-712 Domain
+
+All signatures use the following domain separator:
+
+| Field | Value |
+| --- | --- |
+| `name` | `Kyan` |
+| `version` | `1` |
+| `chainId` | `421614` (Arbitrum Sepolia) |
+| `verifyingContract` | Clearing House contract address |
+
+The domain separator is included in every signature to prevent cross-chain and cross-contract replay attacks. See [Smart Contracts](/reference/smart-contracts) for the current contract addresses.
+
+## Signature Types
+
+Kyan defines 8 EIP-712 types for different operations:
+
+| Type | Purpose |
+| --- | --- |
+| `UserLimitOrder` | Place a limit order with a specified price |
+| `UserMarketOrder` | Place a market order at the best available price |
+| `UserComboOrder` | Place a multi-leg combo order for options strategies |
+| `CancelOrdersType` | Cancel one or more specific orders by ID |
+| `CancelAllOrdersType` | Cancel all open orders for the account |
+| `FillRFQType` | Fill a request for quote from a market maker |
+| `OneClickSignature` | Enable a one-click trading session |
+| `HeartbeatType` | Keep an active session alive |
+
+## Implementation Notes
+
+### Account Types
+
+Signatures support both main accounts and sub-accounts. When signing for a sub-account, include the `subAccountId` field. Main account signatures omit this field or set it to `0`.
+
+### Field Precision
+
+All price and size fields must be submitted as fixed-point integers scaled to 18 decimal places. For example, a price of `1800.50` becomes `1800500000000000000000`. Incorrect precision will cause signature validation to fail.
+
+### Critical Requirements
+
+<Callout type="warn">
+A signature that does not meet these requirements will be rejected by the matching engine and cannot be recovered.
+</Callout>
+
+- **Nonce uniqueness** -- each signature must include a unique nonce. Reusing a nonce causes the order to be rejected.
+- **Expiry timestamps** -- all order signatures include an `expiry` field (Unix timestamp). Expired signatures are invalid.
+- **Chain ID match** -- the `chainId` in the domain must match the network the clearing house is deployed on.
+- **Signer authorization** -- the signer address must be authorized on the account. Unauthorized signers are rejected.
+
+<CardGrid>
+  <LinkCard title="API Keys" href="/reference/api-keys" description="Authentication and key management" />
+  <LinkCard title="REST API" href="/reference/rest-api" description="Full endpoint reference" />
+  <LinkCard title="Order Types" href="/reference/order-types" description="Supported order types and parameters" />
+</CardGrid>

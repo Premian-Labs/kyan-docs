@@ -1,0 +1,100 @@
+---
+title: "WebSocket Session Recovery"
+description: "Recover your WebSocket session and missed messages after a disconnection."
+---
+
+<Callout type="info">
+Session recovery builds on top of the [WebSocket Connection](/reference/ws-connection) lifecycle. Read that page first.
+</Callout>
+
+## Overview
+
+Session recovery allows you to resume a disconnected WebSocket session within a **30-second window**. When enabled, the server buffers outbound messages after a disconnection. After reconnecting and re-authenticating, you can recover the session and receive any messages you missed.
+
+## Enabling Session Recovery
+
+Send the `enable_session_recovery` command after authentication to opt in. This must be done on every new connection -- session recovery is not enabled by default.
+
+```json
+{
+  "op": "enable_session_recovery"
+}
+```
+
+The server responds with a `session_id` that identifies your recoverable session:
+
+```json
+{
+  "type": "response",
+  "op": "enable_session_recovery",
+  "data": {
+    "session_id": "sess_abc123"
+  }
+}
+```
+
+Store this `session_id` on the client side. You will need it to recover the session after a disconnection.
+
+## Recovering a Session
+
+After reconnecting and re-authenticating, send the `recover_session` command with your stored `session_id`:
+
+```json
+{
+  "op": "recover_session",
+  "session_id": "sess_abc123"
+}
+```
+
+On success, the server replays all buffered messages in order, followed by a confirmation:
+
+```json
+{
+  "type": "response",
+  "op": "recover_session",
+  "data": {
+    "recovered": true,
+    "messages_replayed": 47
+  }
+}
+```
+
+If the session has expired or cannot be recovered, the server returns an error. In that case, re-subscribe to your channels to receive fresh snapshots.
+
+## Lifecycle Example
+
+```
+1. Connect to wss://ws.kyan.blue/v1
+2. Authenticate (op: auth)
+3. Enable session recovery (op: enable_session_recovery)
+4. Subscribe to channels
+5. --- connection drops ---
+6. Reconnect to wss://ws.kyan.blue/v1
+7. Authenticate (op: auth)
+8. Recover session (op: recover_session)
+9. Receive buffered messages
+10. Resume normal operation
+```
+
+## 30-Second Buffer
+
+The server buffers messages for **30 seconds** after a disconnection. If you reconnect and recover within this window, you receive all missed messages. After 30 seconds, the session expires and buffered messages are discarded.
+
+<Callout type="warn">
+Plan your reconnection logic accordingly. With exponential backoff capped at 30 seconds, you have roughly one retry window before the buffer expires.
+</Callout>
+
+## Best-Effort Recovery
+
+Session recovery is **best-effort**. While the server buffers messages during the recovery window, not all messages are guaranteed to be delivered. Edge cases include:
+
+- The server itself restarts during your disconnection.
+- The buffer overflows due to extremely high message volume.
+- The 30-second window expires before you reconnect.
+
+After recovering, compare sequence numbers on your subscribed channels to detect any remaining gaps. Use the `resend` command to fill them, or re-subscribe for a fresh snapshot if gaps are too large.
+
+<CardGrid>
+  <LinkCard title="WebSocket Connection" href="/reference/ws-connection" description="Connection lifecycle and reconnection strategy" />
+  <LinkCard title="WebSocket Commands" href="/reference/ws-commands" description="Full command reference and gap detection" />
+</CardGrid>

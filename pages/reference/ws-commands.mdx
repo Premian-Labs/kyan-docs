@@ -1,0 +1,109 @@
+---
+title: "WebSocket Commands"
+description: "Request/response protocol and subscription management for the Kyan WebSocket API."
+---
+
+<Callout type="info">
+Read the [WebSocket API overview](/reference/websocket-api) for connection and authentication basics.
+</Callout>
+
+## Commands & Subscriptions
+
+The WebSocket API uses a request/response pattern. Clients send JSON command messages and receive JSON responses on the same connection. Persistent data streams are managed through subscription channels -- subscribe once and receive updates until you unsubscribe or disconnect.
+
+## Server Message Envelope
+
+All server messages follow a consistent envelope format:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | Message type (e.g., `snapshot`, `update`, `error`) |
+| `channel` | string | Channel the message belongs to |
+| `data` | object | Channel-specific payload |
+| `timestamp` | string | ISO 8601 timestamp of the message |
+
+```json
+{
+  "type": "update",
+  "channel": "orderbook:ETH-PERP",
+  "data": { ... },
+  "timestamp": "2026-03-15T12:00:00.123Z"
+}
+```
+
+## Request ID Correlation
+
+Include a `request_id` field in any command to correlate it with the server's response. The server echoes the same `request_id` in its reply, making it straightforward to match responses in asynchronous workflows.
+
+```json
+{
+  "op": "get_instruments",
+  "request_id": "req-001"
+}
+```
+
+```json
+{
+  "type": "response",
+  "request_id": "req-001",
+  "data": { ... }
+}
+```
+
+## Available Commands
+
+| Command | Description |
+| --- | --- |
+| `get_instruments` | List available trading instruments |
+| `get_ob_state_by_instruments` | Get orderbook state for specific instruments |
+| `get_ob_state_by_market` | Get orderbook state for an entire market |
+| `subscribe` | Subscribe to a channel |
+| `unsubscribe` | Unsubscribe from a channel |
+| `unsubscribe_all` | Unsubscribe from all channels |
+| `get_subscriptions` | List active subscriptions |
+| `resend` | Request message recovery for missed messages |
+
+## Gap Detection
+
+Each message on a subscription channel includes a monotonically increasing `sequence` number. Track these per channel to detect gaps. If you observe a sequence jump (e.g., from 42 to 45), use the `resend` command to request the missing messages:
+
+```json
+{
+  "op": "resend",
+  "channel": "orderbook:ETH-PERP",
+  "from_sequence": 43,
+  "to_sequence": 44
+}
+```
+
+If the gap exceeds the server's recovery buffer, re-subscribe to receive a fresh snapshot.
+
+## Subscription Filtering
+
+Subscriptions can be scoped by instrument, market, or account to reduce unnecessary traffic:
+
+- **By instrument** -- subscribe to a specific contract (e.g., `ETH-PERP`, `ETH-28MAR26-2000-C`).
+- **By market** -- subscribe to all instruments within a market (e.g., all ETH options).
+- **By account** -- for account-level channels, filter by your Ethereum address or margin account ID.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "orderbook",
+  "instrument": "ETH-PERP"
+}
+```
+
+```json
+{
+  "op": "subscribe",
+  "channel": "orderbook",
+  "market": "ETH"
+}
+```
+
+<CardGrid>
+  <LinkCard title="WebSocket Authentication" href="/reference/websocket-api#authentication" description="Authenticate your WebSocket connection" />
+  <LinkCard title="WebSocket Connection" href="/reference/ws-connection" description="Connection lifecycle and reconnection strategy" />
+  <LinkCard title="WebSocket Market Data" href="/reference/ws-market-data" description="Subscribe to real-time market data channels" />
+</CardGrid>

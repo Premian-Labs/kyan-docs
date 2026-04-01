@@ -1,0 +1,76 @@
+---
+title: "Account System"
+description: "How Kyan's sub-account and per-asset portfolio system works."
+---
+
+# Account System
+
+Kyan's account system is built around two layers of organization: **sub-accounts** and **per-asset portfolios**. Together, they give traders fine-grained control over how risk is isolated and how capital is allocated across different strategies.
+
+## Sub-accounts
+
+Every wallet address on Kyan can create multiple sub-accounts. Each sub-account is a fully independent trading environment with its own margin balance, open positions, and active orders. There is no shared state between sub-accounts belonging to the same wallet.
+
+This means you can run entirely separate strategies in parallel without any risk of cross-contamination. A high-leverage directional bet in one sub-account cannot trigger a margin call in another sub-account that holds a conservative, hedged portfolio.
+
+Common use cases for sub-accounts include:
+
+- **Strategy isolation.** Run a delta-neutral options strategy in one sub-account and a directional perp trade in another.
+- **Risk bucketing.** Allocate a fixed amount of capital to a sub-account and know that your maximum loss on that strategy is capped at that amount, regardless of what happens in other sub-accounts.
+- **Organizational separation.** Keep different trading books separate for accounting or operational reasons.
+
+Creating and managing sub-accounts is free. There is no limit on how many sub-accounts a wallet can hold.
+
+## Per-asset portfolios
+
+Within each sub-account, positions are grouped into **per-asset portfolios** based on their underlying asset. Kyan currently supports three underlying assets: BTC, ETH, and ARB. Each gets its own portfolio.
+
+A portfolio contains all positions tied to one underlying, meaning all BTC options across every strike and expiry, plus the BTC perpetual, live together in the BTC portfolio. Risk is calculated at the portfolio level, and margin requirements are determined per portfolio.
+
+This grouping is what makes portfolio margin effective. Because all BTC positions are evaluated together, a long BTC call and a short BTC perp in the same portfolio are recognized as a hedged position, and the margin requirement reflects the reduced risk.
+
+## How sub-accounts and portfolios interact
+
+The relationship between these two layers is straightforward:
+
+| Level | Scope | Risk calculation |
+|-------|-------|-----------------|
+| Wallet | Top-level identity | No cross-sub-account risk sharing |
+| Sub-account | Independent trading environment | Margin calculated per sub-account |
+| Portfolio | All positions for one underlying | Risk scenarios run per portfolio |
+
+Margin is evaluated at the portfolio level within each sub-account. A sub-account's total margin requirement is the sum of its individual portfolio margin requirements. There is no netting across portfolios for different underlyings within the same sub-account, and no netting across sub-accounts.
+
+<Callout type="info">
+Cross-portfolio netting is not supported. A profitable ETH portfolio does not reduce the margin requirement of a BTC portfolio in the same sub-account. Each portfolio stands on its own.
+</Callout>
+
+## Why this architecture matters
+
+The sub-account and portfolio system provides risk isolation at every level:
+
+- **Between strategies** (via sub-accounts): a blowup in one strategy cannot cascade into another.
+- **Between underlyings** (via portfolios): risk in one asset does not mask or offset risk in another.
+- **Within an underlying** (via portfolio margin): related positions are evaluated together for capital efficiency.
+
+This layered isolation means traders can be aggressive in one sub-account while keeping conservative positions safe in another, all from a single wallet. It also simplifies the risk engine's job, since each portfolio is a self-contained unit that can be evaluated independently.
+
+---
+
+<LinkCard
+  href="/concepts/portfolio-margin"
+  title="Portfolio Margin"
+  description="How the risk engine evaluates portfolios for margin"
+/>
+
+<LinkCard
+  href="/concepts/about-kyan"
+  title="About Kyan"
+  description="Platform architecture and key systems"
+/>
+
+<LinkCard
+  href="/concepts/liquidations"
+  title="Liquidations"
+  description="What happens when a portfolio's margin falls short"
+/>

@@ -1,0 +1,86 @@
+---
+title: "About Kyan"
+description: "An overview of the Kyan platform architecture and key systems."
+---
+
+# About Kyan
+
+Kyan is a decentralized derivatives exchange built on Arbitrum, offering both options and perpetual futures trading. It combines on-chain settlement with off-chain order matching to deliver the performance of a centralized exchange while preserving the transparency and self-custody guarantees of DeFi.
+
+The platform is designed for traders who need capital-efficient margining, institutional-grade risk management, and the ability to execute complex multi-leg strategies atomically.
+
+## Core architecture
+
+Kyan's architecture is built around several interconnected systems, each handling a distinct part of the trading lifecycle.
+
+### Portfolio margin
+
+Rather than requiring separate collateral for every position, Kyan uses a portfolio margin system that evaluates all of your positions together. When positions offset each other's risk, the system recognizes the hedge and reduces your total margin requirement accordingly.
+
+At the heart of this is the **RiskMatrix**, a scenario-based risk engine that runs 43 distinct market scenarios against your portfolio. Each scenario simulates a different combination of price moves and volatility shifts. Your margin requirement is set to the worst-case projected loss across all scenarios, ensuring the protocol holds enough collateral without over-margining hedged positions.
+
+This approach gives well-constructed portfolios significantly better capital efficiency than isolated margin systems.
+
+### Account system
+
+Every wallet on Kyan can create multiple **sub-accounts**, each functioning as an independent trading environment with its own margin, positions, and orders. Within each sub-account, positions are organized into **per-asset portfolios** grouped by underlying asset (BTC, ETH, ARB).
+
+This structure provides natural risk isolation. A volatile position in one sub-account cannot affect the margin health of another, and risk is calculated independently per portfolio within each sub-account.
+
+### Risk calculation
+
+The RiskMatrix is the engine that determines how much margin each portfolio requires. It evaluates 43 market scenarios that cover a range of adverse price movements and volatility shifts for each underlying asset.
+
+For every scenario, the engine computes the projected loss across all positions in a portfolio. The margin requirement equals the worst-case loss, plus a safety buffer. This calculation runs continuously as prices move and positions change, keeping margin requirements current at all times.
+
+### Liquidation engine
+
+When a portfolio's margin ratio falls below the maintenance threshold, Kyan's liquidation engine activates a three-phase process designed to minimize disruption:
+
+1. **Delta hedging.** The system first attempts to reduce portfolio risk by liquidating perpetual positions to flatten the portfolio's net delta exposure.
+2. **Portfolio decomposition.** If delta hedging is not sufficient, the system breaks the portfolio into individual positions and liquidates the riskiest ones.
+3. **Full liquidation.** If the account remains underwater after the first two phases, all remaining positions are liquidated. Any negative equity is absorbed by the insurance fund.
+
+This graduated approach protects both the trader and the exchange by resolving margin shortfalls with the least possible market impact.
+
+## Orderbook and matching
+
+Kyan uses a hybrid model: orders are matched off-chain for speed and settled on-chain for transparency. The off-chain matching engine handles order placement, cancellation, and matching at high throughput, while the Arbitrum blockchain serves as the final settlement layer for all trades.
+
+This design eliminates the latency and gas costs of fully on-chain orderbooks while preserving verifiable settlement.
+
+## RFQ system
+
+The request-for-quote (RFQ) system is built for institutional and block-size trades. A trader submits a quote request specifying one or more instruments and sizes, and market makers respond with firm prices. The trader can then accept a quote, and the entire trade executes atomically.
+
+RFQs support multi-instrument requests, meaning you can get a single price for a package of positions (such as an options spread plus a perp hedge) and execute the entire package in one transaction. This eliminates leg risk for complex strategies.
+
+## Combo trades
+
+Combo trades allow multi-leg options strategies to execute as a single atomic order. Instead of placing separate orders for each leg of a spread or straddle and risking partial fills, you submit the entire structure as one order. Either all legs fill or none do.
+
+This is critical for strategies where the individual legs are only attractive as part of a package. A bull call spread, for example, only makes sense if both the long and short call fill together.
+
+<Callout type="info">
+Kyan settles all products in USDC. There is no physical delivery of any underlying asset. Profits, losses, margin, and fees are all denominated in USDC.
+</Callout>
+
+---
+
+<LinkCard
+  href="/concepts/account-system"
+  title="Account System"
+  description="Sub-accounts, per-asset portfolios, and risk isolation"
+/>
+
+<LinkCard
+  href="/concepts/portfolio-margin"
+  title="Portfolio Margin"
+  description="How portfolio margin reduces capital requirements"
+/>
+
+<LinkCard
+  href="/concepts/liquidations"
+  title="Liquidations"
+  description="The three-phase liquidation process"
+/>

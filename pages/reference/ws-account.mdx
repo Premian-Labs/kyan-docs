@@ -1,0 +1,222 @@
+---
+title: "WebSocket Account"
+description: "Real-time account channels: state, positions, trades, transfers, liquidations, and MMP."
+---
+
+<Callout type="info">
+All account channels require authentication. See the [WebSocket API overview](/reference/websocket-api) for auth details.
+</Callout>
+
+## Overview
+
+Seven account channels provide real-time monitoring of your trading account. All require an authenticated WebSocket connection.
+
+| Channel | Description |
+| --- | --- |
+| `account_state` | Margin, PnL, equity, and portfolio Greeks |
+| `position` | Position updates with mark prices and Greeks |
+| `trade` | Trade execution events |
+| `transfer` | Deposit and withdrawal events |
+| `account_liquidation` | Liquidation events |
+| `bankruptcy` | Bankruptcy events |
+| `mmp` | Market Maker Protection trigger events |
+
+## Account State
+
+Real-time margin usage, PnL, equity, and portfolio Greeks. Updates on every position or margin change.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "account_state"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `equity` | string | Total account equity |
+| `margin_used` | string | Margin currently in use |
+| `margin_available` | string | Available margin for new positions |
+| `unrealized_pnl` | string | Unrealized profit and loss |
+| `realized_pnl` | string | Realized profit and loss |
+| `delta` | string | Portfolio delta |
+| `gamma` | string | Portfolio gamma |
+| `vega` | string | Portfolio vega |
+| `theta` | string | Portfolio theta |
+| `rho` | string | Portfolio rho |
+
+```json
+{
+  "type": "update",
+  "channel": "account_state",
+  "data": {
+    "equity": "52340.12",
+    "margin_used": "12500.00",
+    "margin_available": "39840.12",
+    "unrealized_pnl": "1230.45",
+    "realized_pnl": "890.00",
+    "delta": "2.35",
+    "gamma": "0.0012",
+    "vega": "145.20",
+    "theta": "-32.10",
+    "rho": "0.85"
+  }
+}
+```
+
+## Position
+
+Position updates with mark prices and Greeks. Updates every second while positions are open. Covers both perpetual and option positions.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "position"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `instrument` | string | Instrument identifier |
+| `side` | string | `long` or `short` |
+| `size` | string | Position size |
+| `entry_price` | string | Average entry price |
+| `mark_price` | string | Current mark price |
+| `unrealized_pnl` | string | Unrealized PnL for this position |
+| `delta` | string | Position delta |
+| `gamma` | string | Position gamma |
+| `vega` | string | Position vega |
+| `theta` | string | Position theta |
+
+## Trade
+
+Trade execution events. Emitted when your orders are filled, either partially or fully.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "trade"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `trade_id` | string | Unique trade identifier |
+| `order_id` | string | Order that generated the trade |
+| `instrument` | string | Instrument traded |
+| `side` | string | `buy` or `sell` |
+| `price` | string | Execution price |
+| `size` | string | Trade size |
+| `fee` | string | Fee charged for the trade |
+| `fee_currency` | string | Currency the fee is denominated in |
+| `timestamp` | string | ISO 8601 execution timestamp |
+
+```json
+{
+  "type": "update",
+  "channel": "trade",
+  "data": {
+    "trade_id": "trd_789",
+    "order_id": "ord_456",
+    "instrument": "ETH-PERP",
+    "side": "buy",
+    "price": "1842.50",
+    "size": "2.0",
+    "fee": "0.92",
+    "fee_currency": "USDC",
+    "timestamp": "2026-03-15T12:00:01.200Z"
+  }
+}
+```
+
+## Transfer
+
+Deposit and withdrawal monitoring.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "transfer"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `margin_account_id` | string | Margin account identifier |
+| `amount` | string | Transfer amount |
+| `currency` | string | Transfer currency |
+| `action` | string | `deposit` or `withdrawal` |
+| `action_sequence` | integer | Sequence number for ordering transfer events |
+| `timestamp` | string | ISO 8601 timestamp |
+
+## Account Liquidation
+
+<Callout type="warn">
+This channel is currently not available. No events are delivered yet. Subscribe to it now so your client is ready when liquidation events go live.
+</Callout>
+
+Liquidation event monitoring. When available, this channel will emit events when your positions are being liquidated due to insufficient margin.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "account_liquidation"
+}
+```
+
+## Bankruptcy
+
+Bankruptcy events occur when account equity goes negative after a liquidation. The loss that exceeds the account's equity is absorbed by the insurance fund.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "bankruptcy"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `account_id` | string | Affected account |
+| `deficit` | string | Negative equity amount absorbed by the insurance fund |
+| `liquidated_positions` | array | List of positions that were liquidated |
+| `timestamp` | string | ISO 8601 timestamp |
+
+## MMP (Market Maker Protection)
+
+Market Maker Protection trigger events. Emitted when an account is frozen due to rapid losses exceeding the configured MMP threshold.
+
+```json
+{
+  "op": "subscribe",
+  "channel": "mmp"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `frozen_account` | string | Account that was frozen |
+| `pair` | string | Trading pair that triggered the freeze |
+| `freeze_duration` | integer | Duration of the freeze in milliseconds |
+| `expiration` | string | ISO 8601 timestamp when the freeze expires |
+| `loss_amount` | string | Cumulative loss that triggered the freeze |
+
+```json
+{
+  "type": "update",
+  "channel": "mmp",
+  "data": {
+    "frozen_account": "0xAbC123...",
+    "pair": "ETH_USDC",
+    "freeze_duration": 10000,
+    "expiration": "2026-03-15T12:00:11.000Z",
+    "loss_amount": "5200.00"
+  }
+}
+```
+
+<CardGrid>
+  <LinkCard title="WebSocket Orderbook" href="/reference/ws-orderbook" description="Real-time orderbook channels" />
+  <LinkCard title="Managing Positions" href="/guides/managing-positions" description="Position management and risk controls" />
+  <LinkCard title="Portfolio Margin" href="/concepts/portfolio-margin" description="How margin and liquidation thresholds work" />
+</CardGrid>
