@@ -1,0 +1,72 @@
+---
+title: "Combo Orders"
+description: "How Kyan executes multi-leg option strategies as a single atomic order."
+---
+
+# Combo Orders
+
+Combo orders let you execute multi-leg option strategies as a single, atomic transaction. All legs fill together or none of them do. This eliminates the risk and complexity of building a strategy one leg at a time.
+
+## Why combo orders?
+
+Consider building a bull call spread. You need to buy a call at one strike and sell a call at a higher strike. Without combo orders, you would place two separate orders. Several things can go wrong:
+
+- One leg fills but the other does not, leaving you with unintended directional exposure.
+- The market moves between fills, and the spread costs more than expected.
+- You get partial fills on one leg, creating an imbalanced position.
+
+This is called **leg risk**, and it is one of the biggest practical challenges of multi-leg options trading. Every additional leg multiplies the potential for something to go wrong.
+
+Combo orders solve this by submitting all legs as a single unit. The exchange guarantees atomic execution: the entire strategy fills at once, or it does not fill at all.
+
+## How atomic execution works
+
+When you submit a combo order, Kyan's matching engine does not treat each leg as an independent order. Instead, it evaluates the combo as a whole.
+
+The combined order enters the book and waits until all legs can be matched simultaneously. The engine looks for counterparties across each leg that, together, satisfy the full combo at the specified net price. Only when every leg has a match does the trade execute.
+
+This means you never end up in a partially constructed strategy. Your risk profile is exactly what you intended from the moment the order fills.
+
+## Supported strategies
+
+Kyan supports any combination of options legs within the limits below. Some common strategies include:
+
+- **Vertical spreads** (2 legs) - Buy and sell options at different strikes, same expiry. Used for directional bets with capped risk.
+- **Straddles and strangles** (2 legs) - Buy both a call and a put to profit from large moves in either direction.
+- **Butterflies** (3 legs) - Combine three strikes to profit from low volatility around a target price.
+- **Iron condors** (4 legs) - Sell a strangle and buy a wider strangle for protection. Profits when the underlying stays within a range.
+- **Custom combinations** - Any mix of calls and puts across available strikes and expirations.
+
+## Pricing
+
+Combo orders are priced as a **net debit** or **net credit** rather than pricing each leg individually.
+
+For example, a bull call spread might work like this:
+
+- Buy the 2000 strike call for 120 USDC premium
+- Sell the 2200 strike call for 45 USDC premium
+- **Net debit: 75 USDC**
+
+You submit the combo with a limit on the net debit you are willing to pay. The order fills only if the combined price meets your limit. This simplifies pricing decisions because you think in terms of total strategy cost rather than individual leg prices.
+
+For credit strategies (like iron condors), the net credit is the premium you collect upfront.
+
+## Limitations
+
+- **Maximum 4 legs** per combo order.
+- **Same underlying** required for all legs. You cannot mix ETH and BTC options in a single combo.
+- **Fill time may be longer** than single-leg orders. Because the engine needs to match all legs simultaneously, combos with unusual strikes or large size may take more time to fill, especially in less liquid markets.
+
+---
+
+<LinkCard
+  href="/tutorials/combo-trade"
+  title="Your First Combo Trade"
+  description="Build your first multi-leg strategy"
+/>
+
+<LinkCard
+  href="/guides/combo-strategies"
+  title="Combo Strategies"
+  description="Advanced strategy construction"
+/>

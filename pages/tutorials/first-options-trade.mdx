@@ -1,0 +1,70 @@
+---
+title: "Your First Options Trade"
+description: "Walk through buying a call option on Kyan step by step."
+---
+
+# Your First Options Trade
+
+<Callout type="tip">
+  New to options? Read [Options Basics](/concepts/options-basics) first.
+</Callout>
+
+This tutorial walks you through buying a call option on Kyan from start to finish. By the end you will have a live position and know how to monitor it.
+
+<Callout type="info">
+  **Prerequisites**
+
+  - A connected wallet with USDC deposited -- see [Getting Started](/tutorials/getting-started) if you have not done this yet
+</Callout>
+
+<Steps>
+
+### Select the Options Market
+
+Select the **Options** tab from the top navigation bar and choose the underlying asset you want to trade. For this tutorial we will use **ETH**. This opens the options chain for that asset.
+
+### Choose an Expiry
+
+The options chain displays available expiration dates across the top. Select your preferred expiration date from the available maturities. Nearer-dated options are cheaper but decay faster; further-dated options give the trade more time to play out.
+
+### Pick a Strike Price
+
+Select the strike price for your call option based on your market outlook. A strike slightly above the current market price (out-of-the-money) costs less premium but requires a larger move to become profitable. A strike at or below the current price (at- or in-the-money) costs more but has a higher probability of finishing in profit.
+
+### Set Your Order
+
+Enter the number of contracts you want to buy. Choose between a **market order** (fills immediately at the best available price) or a **limit order** (fills only at your specified price or better). The order ticket will display:
+
+- **Premium** -- the total cost of the option
+- **Max profit** -- unlimited for calls
+- **Max loss** -- limited to the premium paid
+- **Breakeven** -- the price the underlying must reach at expiry
+
+### Confirm and Submit
+
+Review the full order summary, then click **Buy**. Confirm the transaction in your wallet. You can watch the order fill in real time on the order book.
+
+### Monitor Your Position
+
+Open the **Positions** tab to track your option. Here you can see:
+
+- **P&L** -- current unrealized profit or loss
+- **Greeks** -- delta, gamma, theta, and vega
+- **Time to expiry** -- countdown to expiration
+
+</Steps>
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard
+    title="Your First Combo Trade"
+    href="/tutorials/combo-trade"
+    description="Combine multiple legs into one strategy"
+  />
+  <LinkCard
+    title="Order Types"
+    href="/reference/order-types"
+    description="See all available order types and parameters"
+  />
+</CardGrid>

@@ -1,0 +1,85 @@
+---
+title: "Managing Positions"
+description: "Monitor, adjust, and close your open options and perpetual positions."
+---
+
+<Callout type="info">
+Just getting started? Complete the [getting started tutorial](/tutorials/getting-started) first.
+</Callout>
+
+Once you have open trades, the Positions panel becomes your primary workspace for monitoring performance, adjusting exposure, and closing out positions.
+
+## Viewing open positions
+
+The **Positions** panel displays all open positions with the following key metrics:
+
+| Column | Description |
+| --- | --- |
+| Instrument | The contract name (e.g., ETH-PERP, ETH-28MAR-3000-C) |
+| Size | Number of contracts held, with side indicated (long or short) |
+| Entry price | Your volume-weighted average fill price |
+| Mark price | The current market price used for P&L and margin calculations |
+| Unrealized P&L | Profit or loss if you closed at the current mark price |
+| Liquidation price | The price at which your position would be liquidated |
+
+Use the toggle at the top of the panel to switch between **Options** and **Perpetuals** views.
+
+## Adjusting a position
+
+### Increase size
+
+Place a new order in the **same direction** as your existing position. The new fill is averaged into your entry price.
+
+### Decrease size
+
+Place an order in the **opposite direction** for a partial amount. For example, if you are long 10 ETH-PERP and want to reduce by half, sell 5 ETH-PERP.
+
+### Change leverage on perpetuals
+
+Click the position row to expand it, then select **Adjust Leverage**. Increasing leverage reduces the margin allocated to the position but moves your liquidation price closer. Decreasing leverage does the opposite.
+
+## Setting stop-loss and take-profit
+
+Click any position row to expand it, then select **Add TP/SL**:
+
+- **Take profit** -- set a price at which the position automatically closes to lock in gains.
+- **Stop loss** -- set a price at which the position automatically closes to limit losses.
+
+Both can be attached simultaneously to the same position. Each creates a conditional order that triggers when the mark price crosses your specified threshold.
+
+## Closing a position
+
+### Market close
+
+Click the **Close** button on the position row. This sends a market order to close the entire position immediately at the best available price.
+
+### Limit close
+
+Place a limit order in the opposite direction at your target exit price. You get price control, but the order may not fill immediately if the market does not reach your price.
+
+### Partial close
+
+Enter a quantity smaller than your full position size when placing the closing order. The remainder stays open as a reduced position.
+
+## Position history
+
+The **History** tab records all closed positions and individual trade fills. Use it to:
+
+- Review past trades and their realized P&L.
+- Analyze your trading performance over time.
+- Export trades as CSV for record-keeping or tax reporting by clicking the download icon in the top-right corner of the History panel.
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="REST API"
+    description="Query and manage positions programmatically"
+    href="/reference/rest-api"
+  />
+  <LinkCard
+    title="Fees & Funding"
+    description="Understand the costs of holding positions"
+    href="/guides/fees-and-funding"
+  />
+</CardGrid>

@@ -1,0 +1,78 @@
+---
+title: "API Overview"
+description: "Authentication, rate limits, and conventions for the Kyan API."
+---
+
+<Callout type="tip">
+New to Kyan? Start with [Getting Started](/tutorials/getting-started).
+</Callout>
+
+## Base URL
+
+| Environment | URL |
+| --- | --- |
+| Production | `https://api.kyan.blue/v1` |
+| Testnet | `https://api-testnet.kyan.blue/v1` |
+
+## Authentication
+
+All authenticated endpoints require an API key passed via the `X-API-Key` header. Generate keys in the dashboard under **Settings > API Keys**.
+
+```bash
+curl -H "X-API-Key: your-api-key" https://api.kyan.blue/v1/account
+```
+
+Store your secret key securely -- it cannot be retrieved after creation.
+
+## Rate Limits
+
+| Endpoint Category | Limit |
+| --- | --- |
+| Market data | 100 requests/second |
+| Order placement | 10 requests/second |
+
+When the limit is exceeded, the API returns a `429 Too Many Requests` response. For real-time data, use the [WebSocket API](/reference/websocket-api) instead of polling.
+
+Rate limit headers are included in every response:
+
+- `X-RateLimit-Limit` -- maximum requests allowed in the window
+- `X-RateLimit-Remaining` -- requests remaining in the current window
+- `X-RateLimit-Reset` -- Unix timestamp when the window resets
+
+## Request Format
+
+- All request and response bodies use JSON (`Content-Type: application/json`).
+- Timestamps are ISO 8601 format (e.g., `2026-03-15T12:00:00Z`).
+- Amounts are strings to preserve decimal precision (e.g., `"1.2345"` instead of `1.2345`).
+
+## Pagination
+
+All list endpoints support cursor-based pagination with two query parameters:
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `cursor` | string | — | Opaque cursor from the previous response |
+| `limit` | integer | 50 | Number of results per page (max 200) |
+
+The response includes a `nextCursor` field. Pass it as the `cursor` parameter to fetch the next page. When `nextCursor` is `null`, there are no more results.
+
+## Error Handling
+
+All errors return a JSON body with `code` and `message` fields:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INSUFFICIENT_MARGIN",
+    "message": "Not enough margin for the order."
+  }
+}
+```
+
+See [Error Codes](/reference/error-codes) for the full list of codes and troubleshooting steps.
+
+<CardGrid>
+  <LinkCard title="REST API" href="/reference/rest-api" description="Full endpoint reference" />
+  <LinkCard title="WebSocket API" href="/reference/websocket-api" description="Real-time data feeds" />
+</CardGrid>

@@ -1,0 +1,62 @@
+---
+title: "Settlement"
+description: "How positions are settled on Kyan, including options expiry and perpetual funding."
+---
+
+# Settlement
+
+All products on Kyan are cash-settled in USDC. No physical delivery of any underlying asset ever occurs. Whether you are trading options or perpetual futures, your profits, losses, and fees are all denominated and paid in USDC.
+
+This section explains how settlement works for each product type and the oracle infrastructure that determines settlement prices.
+
+## Options settlement
+
+Kyan options follow a European-style settlement model:
+
+- **Exercise at expiry only.** Options can only be exercised at their expiration date, not before. There is no early exercise.
+- **Cash settlement.** At expiry, the difference between the strike price and the settlement price is calculated and paid in USDC. If you hold an ITM call with a 2000 strike and the settlement price is 2150, you receive 150 USDC per contract.
+- **Automatic exercise.** Any option that is in-the-money at expiration is automatically exercised. You do not need to take any action. Out-of-the-money options expire worthless, and no settlement payment occurs.
+- **Settlement price.** The official settlement price is determined by the oracle price at **08:00 UTC** on the expiration date. This specific timestamp is used to prevent last-minute manipulation.
+
+For sellers (writers) of options, the settlement works in reverse. If you sold a call that expires in-the-money, the settlement amount is deducted from your collateral.
+
+## Perpetual settlement
+
+Perpetual futures do not have an expiration date, so there is no single settlement event. Instead, two mechanisms govern the flow of funds:
+
+- **Funding rate settlement** occurs every **8 hours** at 00:00, 08:00, and 16:00 UTC. At each interval, a payment is exchanged between long and short position holders based on the current funding rate. If you hold a position through a funding timestamp, you either pay or receive funding proportional to your position size.
+- **P&L realization** happens when you close part or all of a position. Your realized P&L is the difference between your entry price and exit price, multiplied by the position size. Until you close, your P&L is unrealized and reflects the current mark-to-market value of the position.
+
+Unrealized P&L updates continuously but does not transfer funds. Only closing a position or receiving/paying funding moves USDC in or out of your account.
+
+## Oracle system
+
+Accurate, manipulation-resistant pricing is critical to fair settlement. Kyan uses a decentralized oracle network powered by Chainlink to provide settlement prices.
+
+The oracle aggregates price data from multiple independent sources across major exchanges. This aggregation smooths out anomalies from any single venue and makes it extremely difficult for a bad actor to manipulate the settlement price.
+
+For options settlement, the oracle price at the designated timestamp (08:00 UTC on expiry) is captured and used as the definitive settlement price. For perpetual funding, the oracle provides the spot index price that the funding rate calculation references.
+
+## Dispute resolution
+
+In rare cases, an oracle malfunction or extreme market conditions could produce an incorrect or unreliable settlement price. Kyan has governance mechanisms in place to handle these situations:
+
+- Settlement can be **delayed** if the governance process identifies a potential oracle issue before the settlement timestamp.
+- A **dispute resolution** process allows stakeholders to flag suspicious settlement prices and trigger a review.
+- If a settlement price is determined to be incorrect, governance can authorize a corrected settlement.
+
+These safeguards exist as a last resort. Under normal market conditions, the oracle system operates automatically and settlement proceeds without intervention.
+
+---
+
+<LinkCard
+  href="/guides/fees-and-funding"
+  title="Fees & Funding"
+  description="Understand the costs of trading and holding positions"
+/>
+
+<LinkCard
+  href="/concepts/portfolio-margin"
+  title="Portfolio Margin"
+  description="How margin interacts with settlement"
+/>

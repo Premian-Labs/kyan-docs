@@ -1,0 +1,51 @@
+---
+title: "Error Codes"
+description: "API error codes and troubleshooting guide."
+---
+
+All errors return a JSON body with `code` and `message` fields:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INSUFFICIENT_MARGIN",
+    "message": "Not enough margin for the order."
+  }
+}
+```
+
+## HTTP Status Codes
+
+| Code | Meaning |
+| --- | --- |
+| 400 | Bad Request -- Invalid parameters |
+| 401 | Unauthorized -- Invalid or missing API key |
+| 403 | Forbidden -- Insufficient permissions |
+| 404 | Not Found -- Resource doesn't exist |
+| 429 | Too Many Requests -- Rate limit exceeded |
+| 500 | Internal Server Error |
+
+## Application Error Codes
+
+| Code | Message | Resolution |
+| --- | --- | --- |
+| `INSUFFICIENT_MARGIN` | Not enough margin | Deposit more collateral or reduce order size |
+| `INVALID_ORDER` | Order validation failed | Check order parameters |
+| `MARKET_CLOSED` | Market is not active | Wait for market to reopen |
+| `SELF_TRADE` | Order would self-trade | Adjust price to avoid crossing own orders |
+| `MAX_POSITIONS` | Position limit reached | Close existing positions before opening new ones |
+| `PRICE_BAND` | Price outside allowed band | Adjust price within the current band |
+
+## WebSocket Error Codes
+
+| Code | Message | Resolution |
+| --- | --- | --- |
+| `AUTH_FAILED` | Authentication failed | Verify your API key and signature |
+| `INVALID_CHANNEL` | Channel does not exist | Check the channel name format |
+| `RATE_LIMITED` | Too many subscribe requests | Reduce subscription frequency |
+
+<CardGrid>
+  <LinkCard title="API Overview" href="/reference/api-overview" description="Review authentication and rate limits" />
+  <LinkCard title="REST API" href="/reference/rest-api" description="Full endpoint reference" />
+</CardGrid>

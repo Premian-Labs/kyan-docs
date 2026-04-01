@@ -1,0 +1,74 @@
+---
+title: "How to Use Portfolio Margin"
+description: "Enable portfolio margin to reduce margin requirements and improve capital efficiency."
+---
+
+<Callout type="info">
+Understand the theory first: [Portfolio Margin explained](/concepts/portfolio-margin).
+</Callout>
+
+Portfolio margin evaluates risk across your entire portfolio rather than on a per-position basis. By recognizing hedges and offsets between correlated positions, it can significantly reduce your total margin requirements compared to isolated margin mode.
+
+## Enable portfolio margin
+
+<Steps>
+
+### Navigate to margin settings
+
+Open **Settings > Margin Mode** from the account menu in the top-right corner.
+
+### Switch to portfolio mode
+
+Toggle from **Isolated** to **Portfolio** margin mode.
+
+### Confirm the risk disclosure
+
+Review and accept the risk disclosure that explains how portfolio margin differs from isolated margin.
+
+</Steps>
+
+## Check your margin requirements
+
+Open the **Portfolio Summary** panel to view your current margin state:
+
+- **Total margin used** -- the dollar amount of collateral currently locked across all positions.
+- **Initial margin** -- the collateral required to open new positions. You cannot open a trade if it would push your usage above this threshold.
+- **Maintenance margin** -- the minimum collateral required to keep existing positions open. Dropping below this level triggers a margin call.
+- **Margin ratio** -- total margin used as a percentage of your account equity. Lower is safer.
+
+Set up threshold alerts in **Settings > Notifications** (e.g., alerts at 70%, 80%, and 90% margin ratio) so you are never caught off guard.
+
+## Optimize your portfolio
+
+- **Hedged positions reduce margin.** A long ETH perpetual paired with a short ETH call creates a natural hedge. The margin engine recognizes this offset and requires less collateral than the sum of the two positions in isolation.
+- **Diversify across uncorrelated assets.** Spreading exposure across different underlyings reduces concentration risk and can improve margin efficiency.
+- **Avoid concentrated single-direction exposure.** A portfolio that is entirely long or entirely short receives little benefit from portfolio margining.
+- **Monitor your margin ratio continuously.** Stress-test parameters widen during volatile markets, which can increase margin requirements rapidly even without new trades.
+
+## Handle margin calls
+
+When your margin ratio reaches the maintenance threshold:
+
+1. **You receive a notification** via the channels configured in Settings > Notifications.
+2. **Add collateral** by depositing additional funds to your account to bring the ratio back within safe levels.
+3. **Reduce positions** by closing or reducing your most margin-intensive trades. Focus on positions with the highest individual margin contribution.
+4. **If you take no action**, the liquidation engine will begin closing positions automatically, starting with the largest contributors to portfolio risk.
+
+<Callout type="warning">
+Portfolio margin can increase risk. If the portfolio risk engine determines elevated risk, margin requirements may increase without warning.
+</Callout>
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="API Overview"
+    description="Manage margin programmatically via the API"
+    href="/reference/api-overview"
+  />
+  <LinkCard
+    title="Managing Positions"
+    description="Adjust positions to manage margin"
+    href="/guides/managing-positions"
+  />
+</CardGrid>

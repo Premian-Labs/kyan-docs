@@ -1,0 +1,72 @@
+---
+title: "Perpetual Futures"
+description: "How perpetual futures work and how they differ from traditional futures contracts."
+---
+
+# Perpetual Futures
+
+Perpetual futures, commonly called perps, are derivative contracts that let you speculate on the price of an asset without ever owning it. Unlike traditional futures that expire on a set date, perpetual futures have no expiration. Your position stays open until you choose to close it or get liquidated.
+
+This simple difference makes perps the most popular derivative instrument in crypto, accounting for the majority of trading volume across decentralized and centralized exchanges.
+
+## How perps work
+
+A perpetual futures contract tracks the price of an underlying asset (such as ETH or BTC). When you open a long position, you profit when the price goes up. When you open a short position, you profit when the price goes down.
+
+Because perps use leverage, you can control a position larger than your deposited collateral. A 10x leveraged position on $1,000 of collateral gives you $10,000 of exposure. This amplifies both gains and losses proportionally.
+
+Unlike spot trading, you never take custody of the underlying asset. Everything is settled in your margin currency, and your profit or loss is calculated continuously as the market moves.
+
+## Funding mechanism
+
+Without an expiration date, there is no natural mechanism to keep the perps price aligned with the spot price. This is where the funding rate comes in.
+
+The funding rate is a periodic payment exchanged between long and short position holders:
+
+- When the perps price trades **above** the spot price, the funding rate is positive, and **longs pay shorts**. This incentivizes traders to short the contract and pushes the price back toward spot.
+- When the perps price trades **below** the spot price, the funding rate is negative, and **shorts pay longs**. This incentivizes buying and pushes the price back up.
+
+On Kyan, funding settles every **8 hours** at 00:00, 08:00, and 16:00 UTC. The payment is proportional to your position size and the current funding rate. If you close your position before a funding settlement, you do not pay or receive that period's funding.
+
+## Leverage and margin
+
+Leverage determines how much exposure you get relative to your collateral. At 10x leverage, you need 10% of the position value as initial margin. At 20x, you need 5%.
+
+Kyan supports two margin modes:
+
+- **Isolated margin** assigns a specific amount of collateral to each position. If that position is liquidated, only the assigned margin is lost. Your other positions and account balance are unaffected.
+- **Portfolio margin** evaluates all your positions together, allowing hedged positions to offset each other's risk and reduce your total margin requirement.
+
+**Liquidation** occurs when your margin falls below the maintenance margin threshold. At that point, the protocol closes your position to prevent further losses. Using lower leverage and maintaining adequate margin are the primary ways to avoid liquidation.
+
+## Mark price vs last price
+
+Two price concepts are critical to understand when trading perps:
+
+- **Last price** is the most recent trade price on the exchange. It reflects actual executed orders but can be volatile and susceptible to manipulation through thin order books.
+- **Mark price** is a fair price calculated from the spot index price plus a decaying basis. It smooths out short-term volatility and is resistant to manipulation.
+
+Kyan uses the mark price for liquidation calculations and unrealized P&L display. This prevents a single large trade or a wick from triggering unnecessary liquidations. Your realized P&L, however, is based on the actual prices at which you open and close your position.
+
+## Perpetuals on Kyan
+
+Kyan's perpetual futures are designed for transparency and capital efficiency:
+
+- **Up to 20x leverage** on supported markets.
+- **USDC-margined**, so all collateral, P&L, and funding payments are denominated in USDC.
+- **Portfolio margin available** for traders who want cross-position margining across perps and options.
+- **On-chain settlement** ensures all trades, funding payments, and liquidations are transparent and verifiable.
+
+---
+
+<LinkCard
+  href="/tutorials/first-perps-trade"
+  title="Your First Perps Trade"
+  description="Open your first perpetual position"
+/>
+
+<LinkCard
+  href="/guides/fees-and-funding"
+  title="Fees & Funding"
+  description="Understand funding rates and costs"
+/>

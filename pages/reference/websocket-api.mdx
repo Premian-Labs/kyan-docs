@@ -1,0 +1,89 @@
+---
+title: "WebSocket API"
+description: "Real-time market data and order update feeds."
+---
+
+<Callout type="info">
+Read the [API Overview](/reference/api-overview) for authentication and conventions.
+</Callout>
+
+## Connection
+
+Connect to the WebSocket endpoint:
+
+```
+wss://ws.kyan.blue/v1
+```
+
+After connecting, authenticate by sending an auth message with your API key:
+
+```json
+{
+  "op": "auth",
+  "apiKey": "your-api-key",
+  "timestamp": 1711900000000,
+  "signature": "hmac-sha256-signature"
+}
+```
+
+## Subscribing to Channels
+
+Send a JSON message to subscribe or unsubscribe from channels:
+
+```json
+{
+  "op": "subscribe",
+  "channels": ["orderbook:ETH-PERP", "trades:ETH-PERP"]
+}
+```
+
+```json
+{
+  "op": "unsubscribe",
+  "channels": ["orderbook:ETH-PERP"]
+}
+```
+
+## Channels
+
+| Channel | Description | Example |
+| --- | --- | --- |
+| `orderbook:{symbol}` | Real-time order book updates | `orderbook:ETH-PERP` |
+| `trades:{symbol}` | Trade feed | `trades:ETH-PERP` |
+| `ticker:{symbol}` | Ticker updates | `ticker:ETH-PERP` |
+| `candles:{symbol}:{interval}` | Candlestick updates | `candles:ETH-PERP:1m` |
+| `orders` | Your order updates | `orders` |
+| `positions` | Your position updates | `positions` |
+| `funding` | Funding rate updates | `funding` |
+
+## Message Format
+
+All data messages are JSON objects with the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | Message type (e.g., `snapshot`, `update`) |
+| `channel` | string | Channel name the message belongs to |
+| `data` | object | Channel-specific payload |
+| `timestamp` | string | ISO 8601 timestamp of the message |
+
+```json
+{
+  "type": "update",
+  "channel": "orderbook:ETH-PERP",
+  "data": {
+    "bids": [["1800.50", "12.5"]],
+    "asks": [["1800.75", "8.3"]]
+  },
+  "timestamp": "2026-03-15T12:00:00.123Z"
+}
+```
+
+## Heartbeat
+
+The server sends a `ping` frame every 30 seconds. Your client must respond with a `pong` frame. If the server receives no `pong` within 60 seconds, the connection is closed.
+
+<CardGrid>
+  <LinkCard title="REST API" href="/reference/rest-api" description="HTTP endpoints for non-real-time operations" />
+  <LinkCard title="Getting Started" href="/tutorials/getting-started" description="Set up your account and start trading" />
+</CardGrid>

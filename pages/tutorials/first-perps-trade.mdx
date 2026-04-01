@@ -1,0 +1,72 @@
+---
+title: "Your First Perps Trade"
+description: "Open your first perpetual futures position on Kyan."
+---
+
+# Your First Perps Trade
+
+<Callout type="tip">
+  New to perps? Read [Perpetual Futures](/concepts/perpetuals) first.
+</Callout>
+
+This tutorial guides you through opening a leveraged perpetual futures position on Kyan. You will choose a market, set leverage and size, review margin requirements, and learn how to monitor your position once it is live.
+
+<Callout type="info">
+  **Prerequisites**
+
+  - A connected wallet with USDC deposited -- see [Getting Started](/tutorials/getting-started) if you have not done this yet
+</Callout>
+
+<Steps>
+
+### Select the Perps Market
+
+Select the **Perps** tab from the top navigation bar and choose the underlying asset you want to trade. For this tutorial we will use **ETH-PERP**. This opens the perpetual futures trading view for that market.
+
+### Choose Your Direction
+
+Decide whether you are bullish or bearish on the asset:
+
+- **Long (buy)** -- you profit when the price goes up
+- **Short (sell)** -- you profit when the price goes down
+
+Click the corresponding button on the order ticket.
+
+### Set Leverage
+
+Adjust the leverage slider to choose your multiplier, from **1x** up to **20x**. Higher leverage amplifies both gains and losses and moves your liquidation price closer to your entry. If you are new to perpetuals, start with low leverage (2x--5x) until you are comfortable with the mechanics.
+
+### Enter Order Details
+
+Set your position size in contracts or USD notional value. Choose between a **market order** (fills immediately) or a **limit order** (fills at your specified price or better). If you select a limit order, enter your desired price.
+
+### Review Margin Requirements
+
+Before submitting, review the key risk parameters displayed in the order ticket:
+
+- **Initial margin** -- the collateral required to open the position
+- **Maintenance margin** -- the minimum collateral to keep the position open
+- **Liquidation price** -- the price at which your position would be forcibly closed
+
+Make sure you are comfortable with the liquidation price relative to current market conditions.
+
+### Confirm and Execute
+
+Review the full order summary, then click **Confirm**. Approve the transaction in your wallet. Once filled, your position will appear in the **Positions** panel.
+
+</Steps>
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard
+    title="Managing Positions"
+    href="/guides/managing-positions"
+    description="Learn how to adjust, close, and monitor positions"
+  />
+  <LinkCard
+    title="Fees & Funding"
+    href="/guides/fees-and-funding"
+    description="Understand funding rates for perpetual positions"
+  />
+</CardGrid>

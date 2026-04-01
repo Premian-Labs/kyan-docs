@@ -1,0 +1,69 @@
+---
+title: "Options Basics"
+description: "What crypto options are, how they work, and key terminology."
+---
+
+# Options Basics
+
+Options are derivative contracts that give you the right, but not the obligation, to buy or sell an underlying asset at a predetermined price before or on a specific date. They are one of the most versatile instruments in finance, allowing traders to hedge risk, speculate on price direction, or generate income from existing positions.
+
+## What is an option?
+
+Every option contract has two sides: a buyer and a seller (also called the writer). The buyer pays a premium upfront for the right the contract grants. The seller collects that premium and takes on the obligation to fulfill the contract if the buyer exercises it.
+
+There are two types of options:
+
+- **Call options** give the buyer the right to _buy_ the underlying asset at the strike price. Traders buy calls when they expect the price to go up.
+- **Put options** give the buyer the right to _sell_ the underlying asset at the strike price. Traders buy puts when they expect the price to go down.
+
+The **strike price** is the predetermined price at which the option can be exercised. The **premium** is the cost of purchasing the option. And every option has an **expiration date**, after which the contract is no longer valid.
+
+Whether an option has value at expiration depends on the relationship between the strike price and the current market price of the underlying asset.
+
+## Key terminology
+
+| Term | Definition |
+|------|-----------|
+| Call | Right to buy the underlying asset at the strike price |
+| Put | Right to sell the underlying asset at the strike price |
+| Strike price | The predetermined price at which the option can be exercised |
+| Premium | The cost of buying an option contract |
+| Expiration | The date when the option contract expires |
+| In-the-money (ITM) | Option has intrinsic value (e.g., a call where the market price is above the strike) |
+| Out-of-the-money (OTM) | Option has no intrinsic value (e.g., a call where the market price is below the strike) |
+| At-the-money (ATM) | The strike price equals the current market price of the underlying |
+
+## The Greeks
+
+Options prices are influenced by several factors beyond the current price of the underlying asset. These sensitivities are measured by a set of values known as the Greeks.
+
+- **Delta** measures how much the option price changes for a $1 move in the underlying. A call with a delta of 0.50 will gain roughly $0.50 for every $1 the underlying rises.
+- **Gamma** measures the rate of change of delta itself. High gamma means delta shifts quickly as the underlying moves, which is common for at-the-money options near expiration.
+- **Theta** measures time decay, the amount of value the option loses each day as it approaches expiration. All else being equal, options lose value over time.
+- **Vega** measures sensitivity to implied volatility. When volatility rises, option premiums increase, and vega tells you by how much.
+
+Understanding the Greeks is essential for managing options positions, especially when constructing multi-leg strategies or hedging a portfolio.
+
+## Options on Kyan
+
+Kyan's options have several characteristics that distinguish them from traditional options markets:
+
+- **Cash-settled in USDC.** No physical delivery of the underlying asset occurs. At expiration, the difference between the strike price and the settlement price is paid out in USDC.
+- **European-style exercise.** Options can only be exercised at expiration, not before. This simplifies pricing and removes the complexity of early exercise decisions.
+- **Automatic exercise at expiry.** Any option that is in-the-money at expiration is automatically exercised. You do not need to manually exercise profitable contracts.
+
+These design choices reduce operational complexity and make options accessible to a wider range of traders, while maintaining the full strategic flexibility that options provide.
+
+---
+
+<LinkCard
+  href="/tutorials/first-options-trade"
+  title="Your First Options Trade"
+  description="Put theory into practice"
+/>
+
+<LinkCard
+  href="/concepts/combo-orders"
+  title="Combo Orders"
+  description="Combine options into multi-leg strategies"
+/>

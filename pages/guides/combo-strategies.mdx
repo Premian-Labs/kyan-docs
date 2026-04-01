@@ -1,0 +1,69 @@
+---
+title: "Building Combo Strategies"
+description: "Construct multi-leg options strategies like spreads, straddles, and iron condors."
+---
+
+<Callout type="info">
+New to combos? Start with the [combo trade tutorial](/tutorials/combo-trade).
+</Callout>
+
+Kyan's combo builder lets you construct and execute multi-leg options strategies atomically. All legs fill simultaneously or not at all, eliminating the risk of partial execution that comes with legging into a strategy manually.
+
+## Vertical spreads
+
+A vertical spread combines a long and short option of the same type, same expiry, at different strikes. There are two common variants:
+
+| Strategy | Legs | Outlook |
+| --- | --- | --- |
+| Bull call spread | Buy lower-strike call, sell higher-strike call | Moderately bullish |
+| Bear put spread | Buy higher-strike put, sell lower-strike put | Moderately bearish |
+
+**When to use:** You have a directional view but want to cap both your risk and your cost. The short leg offsets part of the premium of the long leg, lowering your entry cost in exchange for limited upside.
+
+**How to build:** Open the **Combo Builder**, select the first leg from the options chain, then add the second leg at a different strike. The payoff diagram updates in real time so you can verify the risk/reward profile before submitting.
+
+## Straddles and strangles
+
+Both strategies involve buying a call and a put on the same underlying and expiry to profit from large price moves in either direction.
+
+| Strategy | Legs | Key difference |
+| --- | --- | --- |
+| Straddle | Buy call and put at the **same** strike | Higher cost, tighter breakevens |
+| Strangle | Buy call and put at **different** strikes (both OTM) | Lower cost, wider breakevens |
+
+**When to use:** You expect high volatility -- for example, ahead of a major protocol upgrade or macro event -- but are unsure of the direction. The position profits when the underlying moves far enough in either direction to exceed the total premium paid.
+
+## Iron condors
+
+An iron condor is a four-leg strategy that combines a bull put spread and a bear call spread. It profits when the underlying stays within a defined range.
+
+| Leg | Action | Strike |
+| --- | --- | --- |
+| 1 | Buy put | Lowest strike (downside protection) |
+| 2 | Sell put | Lower-middle strike |
+| 3 | Sell call | Upper-middle strike |
+| 4 | Buy call | Highest strike (upside protection) |
+
+**When to use:** You expect the market to stay range-bound with low volatility. You collect net premium upfront and keep the full credit if the underlying stays between the two short strikes at expiry.
+
+## Tips for combo orders
+
+- **Atomic execution guarantee.** All legs fill at once or the entire order is cancelled. You will never end up with an incomplete strategy.
+- **Slippage considerations.** Set a net limit price for the entire combo rather than pricing each leg individually. The matching engine evaluates the combined price across all legs.
+- **Monitor combined Greeks.** The Combo Builder displays the net delta, gamma, theta, and vega of your structure. Use these to understand your aggregate exposure before submitting.
+- **Cancellation.** Unfilled combo orders can be cancelled at any time from the Orders tab.
+
+## Next steps
+
+<CardGrid>
+  <LinkCard
+    title="Order Types"
+    description="Technical details on combo order parameters"
+    href="/reference/order-types"
+  />
+  <LinkCard
+    title="Combo Orders"
+    description="How multi-leg execution works under the hood"
+    href="/concepts/combo-orders"
+  />
+</CardGrid>

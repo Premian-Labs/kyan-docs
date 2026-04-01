@@ -1,0 +1,87 @@
+---
+title: "Order Types"
+description: "All supported order types and their parameters."
+---
+
+<Callout type="tip">
+For a hands-on walkthrough, try the [options trade tutorial](/tutorials/first-options-trade).
+</Callout>
+
+## Market Order
+
+Executes immediately at the best available price.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Market symbol (e.g., `ETH-PERP`) |
+| `side` | string | Yes | `buy` or `sell` |
+| `size` | string | Yes | Order size |
+
+Market orders are subject to slippage. Use limit orders for price-sensitive trades.
+
+## Limit Order
+
+Executes at the specified price or better.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Market symbol |
+| `side` | string | Yes | `buy` or `sell` |
+| `size` | string | Yes | Order size |
+| `price` | string | Yes | Limit price |
+| `timeInForce` | string | No | `GTC` (default), `IOC`, or `FOK` |
+
+## Stop Order
+
+Triggers a market order when the stop price is reached. Commonly used for stop-loss protection.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Market symbol |
+| `side` | string | Yes | `buy` or `sell` |
+| `size` | string | Yes | Order size |
+| `stopPrice` | string | Yes | Trigger price |
+
+## Stop-Limit Order
+
+Triggers a limit order when the stop price is reached. Provides price protection after the trigger.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Market symbol |
+| `side` | string | Yes | `buy` or `sell` |
+| `size` | string | Yes | Order size |
+| `stopPrice` | string | Yes | Trigger price |
+| `price` | string | Yes | Limit price for the triggered order |
+
+## Combo Order
+
+Multi-leg order for options strategies. All legs execute atomically -- either all legs fill or none fill.
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `legs` | array | Yes | Array of leg objects |
+| `type` | string | Yes | `market` or `limit` |
+| `price` | string | For limit | Net price for the combo |
+
+Each leg object contains:
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `symbol` | string | Yes | Option symbol |
+| `side` | string | Yes | `buy` or `sell` |
+| `size` | string | Yes | Leg size |
+| `ratio` | integer | No | Leg ratio (default `1`) |
+
+## Time in Force
+
+| Value | Name | Description |
+| --- | --- | --- |
+| `GTC` | Good Till Cancel | Remains active until filled or cancelled |
+| `IOC` | Immediate or Cancel | Fills immediately, cancels unfilled portion |
+| `FOK` | Fill or Kill | Must fill entirely or is cancelled |
+
+<CardGrid>
+  <LinkCard title="REST API" href="/reference/rest-api" description="Place orders via the API" />
+  <LinkCard title="Combo Strategies" href="/guides/combo-strategies" description="Build multi-leg strategies" />
+</CardGrid>

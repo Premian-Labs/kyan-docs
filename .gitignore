@@ -1,0 +1,9 @@
+node_modules/
+out/
+.tome/
+.DS_Store
+*.log
+.env
+.mcp.json
+config.json
+.claude

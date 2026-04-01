@@ -1,0 +1,57 @@
+---
+title: "REST API"
+description: "Complete HTTP endpoint reference for the Kyan trading API."
+---
+
+<Callout type="info">
+Read the [API Overview](/reference/api-overview) for authentication and conventions.
+</Callout>
+
+## Market Data
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/markets` | List all available markets |
+| `GET` | `/markets/{symbol}` | Get market details |
+| `GET` | `/markets/{symbol}/orderbook` | Get order book |
+| `GET` | `/markets/{symbol}/trades` | Get recent trades |
+| `GET` | `/markets/{symbol}/candles` | Get OHLCV candles |
+
+## Options
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/options/chain/{underlying}` | Get options chain |
+| `GET` | `/options/expirations/{underlying}` | List expirations |
+| `GET` | `/options/{symbol}/greeks` | Get option Greeks |
+
+## Orders
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/orders` | Place a new order |
+| `GET` | `/orders` | List open orders |
+| `GET` | `/orders/{id}` | Get order details |
+| `DELETE` | `/orders/{id}` | Cancel an order |
+| `POST` | `/orders/combo` | Place a combo order |
+
+## Positions
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/positions` | List open positions |
+| `GET` | `/positions/{id}` | Get position details |
+| `POST` | `/positions/{id}/close` | Close a position |
+
+## Account
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/account` | Get account info |
+| `GET` | `/account/balances` | Get balances |
+| `GET` | `/account/history` | Get transaction history |
+
+<CardGrid>
+  <LinkCard title="WebSocket API" href="/reference/websocket-api" description="Real-time data and order updates" />
+  <LinkCard title="Error Codes" href="/reference/error-codes" description="Troubleshoot API errors" />
+</CardGrid>

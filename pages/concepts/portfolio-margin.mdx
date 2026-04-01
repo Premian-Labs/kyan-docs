@@ -1,0 +1,58 @@
+---
+title: "Portfolio Margin"
+description: "How portfolio margin calculates risk across your entire portfolio to reduce margin requirements."
+---
+
+# Portfolio Margin
+
+Portfolio margin is a risk-based margining system that evaluates your entire portfolio as a single unit, rather than requiring separate collateral for each individual position. When your positions offset each other's risk, the system recognizes that and lowers your total margin requirement accordingly.
+
+This approach rewards hedged, well-constructed portfolios with significantly better capital efficiency.
+
+## Isolated vs portfolio margin
+
+Under **isolated margin**, every position is treated independently. Each one has its own collateral bucket, its own liquidation threshold, and its own risk. If you hold a long ETH perp and a long ETH put, the system does not recognize that the put protects you against downside moves on the perp. You need full margin for both.
+
+Under **portfolio margin**, the system evaluates all positions together. That same long ETH perp paired with a long ETH put creates a defined-risk position. The maximum loss is bounded, so the margin requirement drops substantially compared to holding each position in isolation.
+
+This difference becomes dramatic as portfolios grow in complexity. A trader running a delta-neutral strategy with multiple options legs and a perp hedge might need 3-5x less margin under portfolio margin than under isolated margin.
+
+## How it works
+
+Kyan's risk engine runs a series of stress-test scenarios across your entire portfolio. These scenarios simulate what would happen to your portfolio value under various adverse price moves, such as the underlying dropping 10%, rising 15%, or volatility spiking.
+
+For each scenario, the engine calculates the projected portfolio loss. Your margin requirement is set to the **worst-case loss** across all scenarios, plus a buffer. This ensures the protocol holds enough collateral to cover the most extreme plausible outcome.
+
+The scenarios are recalculated continuously as market conditions and your positions change, so your margin requirement adjusts in real time.
+
+## Benefits
+
+- **Lower margin requirements.** Hedged positions require less collateral because the system recognizes offsetting risk. Capital that would be locked up under isolated margin is freed for other uses.
+- **Greater capital efficiency.** You can run larger or more complex strategies with the same amount of collateral.
+- **Strategy flexibility.** Multi-leg option strategies, delta-hedged positions, and cross-product portfolios become practical without excessive capital lockup.
+
+## Risks
+
+Portfolio margin is powerful, but it introduces risks that isolated margin does not:
+
+- **Correlated liquidation.** Under isolated margin, only the failing position gets liquidated. Under portfolio margin, a margin shortfall can trigger liquidation across your entire portfolio.
+- **Correlation breakdown.** Portfolio margin assumes that hedges work as expected. In extreme market conditions, correlations between positions can break down, and the hedges may not offset losses as modeled.
+- **Complexity.** Managing a portfolio-margined account requires understanding how changes to any single position affect your total margin and risk profile.
+
+<Callout type="warning">
+Portfolio margin is designed for experienced traders. The increased capital efficiency comes with increased complexity and risk. Make sure you understand how your positions interact before enabling portfolio margin.
+</Callout>
+
+---
+
+<LinkCard
+  href="/guides/portfolio-margin"
+  title="Use Portfolio Margin"
+  description="Step-by-step guide to enabling portfolio margin"
+/>
+
+<LinkCard
+  href="/tutorials/getting-started"
+  title="Getting Started"
+  description="New to Kyan? Start here"
+/>

@@ -1,0 +1,80 @@
+---
+title: "Your First Combo Trade"
+description: "Create a multi-leg options strategy using Kyan's combo order builder."
+---
+
+# Your First Combo Trade
+
+<Callout type="tip">
+  New to combos? Read [Combo Orders](/concepts/combo-orders) to understand multi-leg execution.
+</Callout>
+
+Combo trades let you execute multiple option legs as a single atomic order -- all legs fill together or none of them do. This is how you build strategies like vertical spreads, straddles, and iron condors on Kyan.
+
+<Callout type="info">
+  **Prerequisites**
+
+  - Completed at least one options trade -- see [Your First Options Trade](/tutorials/first-options-trade)
+  - Familiar with options terminology (strikes, expiries, calls, puts)
+</Callout>
+
+<Steps>
+
+### Open the Combo Builder
+
+Click **Combo** in the order panel to open the multi-leg builder. The builder provides a workspace where you can assemble multiple option legs into a single package.
+
+### Add the First Leg
+
+Click **Add Leg** and configure the first option. For example, to build a bull call spread, start by buying a call at a lower strike:
+
+- **Expiry** -- select your target expiration date
+- **Strike** -- choose a strike price near or slightly below the current market price
+- **Type** -- Call
+- **Side** -- Buy
+- **Quantity** -- number of contracts
+
+### Add the Second Leg
+
+Click **Add Leg** again and configure the opposing leg. For the bull call spread, sell a call at a higher strike with the same expiry:
+
+- **Strike** -- choose a strike price above the first leg
+- **Type** -- Call
+- **Side** -- Sell
+- **Quantity** -- same as the first leg
+
+This creates a defined-risk spread where your max loss is the net premium paid and your max profit is the difference between strikes minus the premium.
+
+### Review the Strategy
+
+The builder displays a combined view of your strategy:
+
+- **Net premium** -- total cost (debit) or credit received
+- **Max profit** -- the best-case outcome at expiry
+- **Max loss** -- the worst-case outcome at expiry
+- **Breakeven points** -- the price levels where the strategy transitions between profit and loss
+
+### Submit the Combo Order
+
+Click **Submit Combo Order**. The order executes atomically -- every leg fills or the entire order is cancelled. Confirm the transaction in your wallet and watch the fills appear in the order log.
+
+### Monitor the Strategy
+
+Your combo position appears in the **Positions** panel as a grouped entry. Track the combined P&L across all legs, and review how the position behaves as the underlying price moves and time passes.
+
+</Steps>
+
+## Next Steps
+
+<CardGrid>
+  <LinkCard
+    title="Combo Strategies"
+    href="/guides/combo-strategies"
+    description="Explore advanced strategies like straddles, strangles, and iron condors"
+  />
+  <LinkCard
+    title="Portfolio Margin"
+    href="/guides/portfolio-margin"
+    description="Reduce margin requirements with portfolio margin"
+  />
+</CardGrid>
